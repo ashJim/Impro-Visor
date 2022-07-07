@@ -21,6 +21,7 @@ package imp.trading;
 
 import imp.data.ChordPart;
 import imp.data.MelodyPart;
+import imp.data.Part;
 import imp.gui.Notate;
 import imp.lickgen.transformations.Transform;
 import imp.trading.tradingResponseModes.*;
@@ -148,8 +149,12 @@ public class TradingResponseController {
         return responseInfo.extractFromGrammarSolo(startSlot, slotLength);
     }
     
-    public MelodyPart response(){
+    public Part response(){
+        if(responseMode instanceof ChordifyTRM) {
+            return ((BlockResponseMode) responseMode).generateChords();
+        } else {
             return ((BlockResponseMode) responseMode).generateResponse();
+        }
     }
 
     public TradingResponseInfo getTradingResponseInfo() {

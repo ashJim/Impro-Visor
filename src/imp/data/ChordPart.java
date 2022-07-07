@@ -20,6 +20,7 @@
 
 package imp.data;
 
+import imp.Constants;
 import imp.data.Transposition;
 import imp.style.SectionInfo;
 import imp.style.SectionRecord;
@@ -785,5 +786,17 @@ public void addFromRoadMapChordBlocks(ArrayList<imp.roadmap.brickdictionary.Chor
           }
        }  
     //System.out.println("after: " + this);
+    }
+
+    public ChordPart chordify(int startSlot, int stopSlot) {
+      ChordPart newPart = new ChordPart();
+
+      for(int i = startSlot; i < stopSlot; i++) {
+        if (this.getChord(i) != null) {
+          newPart.addChord(new Chord("Cmaj", Constants.QUARTER));
+        }
+      }
+
+      return newPart;
     }
 }

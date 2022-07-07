@@ -80,7 +80,7 @@ public class LoadAdviceCommand implements Command, Runnable {
         this.file = file;
         this.adv = adv;
 	parent = (Notate)notate;
-	ld = new SplashDialog(notate, false, showSplash);
+	ld = new SplashDialog(notate, false, showSplash); // shows the splash screen on startup
         this.hideSplash = hideSplash;
     }
 

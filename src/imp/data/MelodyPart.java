@@ -27,6 +27,7 @@ import static imp.Constants.knownNoteValue;
 import imp.ImproVisor;
 import imp.com.InsertPartCommand;
 import imp.gui.Notate;
+import imp.lstm.io.leadsheet.Constants;
 import imp.util.ErrorLog;
 import imp.util.Preferences;
 import imp.util.Trace;
@@ -1530,6 +1531,21 @@ public MelodyPart copy(int startingIndex, int endingIndex)
 
 
     return newPart;
+    }
+
+    public MelodyPart everyNoteIsC(int first, int last) {
+      MelodyPart newPart = new MelodyPart();
+      for(int i = first; i <= last; i++) {
+        if(getUnit(i) != null) {
+          newPart.addUnit(getUnit(i).copy());
+        }
+      }
+      for(int i = 0; i < newPart.size - 1; i++) {
+        if(getUnit(i) instanceof Note) {
+          newPart.getNote(i).setPitch(Constants.C4);
+        }
+      }
+      return newPart;
     }
 
   /**

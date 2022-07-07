@@ -20,6 +20,7 @@
 
 package imp.trading;
 import imp.gui.TransformMenuDialog;
+import imp.data.Score;
 
 /**
  * @author Zachary Kondak, formerly ActiveTradingWindow
@@ -31,12 +32,14 @@ import imp.gui.QuantizationDialog;
 import imp.lickgen.LickgenFrame;
 import imp.trading.tradingResponseModes.AbstractMelodyTRM;
 import imp.trading.tradingResponseModes.ChopAndMemorizeTRM;
+import imp.trading.tradingResponseModes.ChordifyTRM;
 import imp.trading.tradingResponseModes.CorrectRhythmTRM;
 import imp.trading.tradingResponseModes.GrammarTRM;
 import imp.trading.tradingResponseModes.MemorizeMotifsTRM;
 import imp.trading.tradingResponseModes.ModifyAndRectifyTRM;
 import imp.trading.tradingResponseModes.RepeatAndRectifyTRM;
 import imp.trading.tradingResponseModes.RepeatTRM;
+import imp.trading.tradingResponseModes.JimTRM;
 import imp.trading.tradingResponseModes.RhythmHelperTRM;
 import imp.trading.tradingResponseModes.SuggestRhythmTRM;
 import imp.trading.tradingResponseModes.TradingResponseMode;
@@ -166,6 +169,8 @@ public class TradingDialog extends javax.swing.JDialog implements TradeListener,
         tradeStopMenuItem = new javax.swing.JMenuItem();
         modeMenu = new javax.swing.JMenu();
         tradeRepeat = new javax.swing.JRadioButtonMenuItem();
+        tradeJim = new javax.swing.JRadioButtonMenuItem();
+        tradeChordify = new javax.swing.JRadioButtonMenuItem();
         tradeRepeatAndRectify = new javax.swing.JRadioButtonMenuItem();
         tradeRandomModify = new javax.swing.JRadioButtonMenuItem();
         tradeAbstract = new javax.swing.JRadioButtonMenuItem();
@@ -853,6 +858,14 @@ public class TradingDialog extends javax.swing.JDialog implements TradeListener,
         tradeRepeat.setToolTipText("Simply repeat user input.");
         modeMenu.add(tradeRepeat);
 
+        modeSelector.add(tradeJim);
+        tradeJim.setText("Jim Trade Mode");
+        modeMenu.add(tradeJim);
+
+        modeSelector.add(tradeChordify);
+        tradeChordify.setText("Chordify");
+        modeMenu.add(tradeChordify);
+
         modeSelector.add(tradeRepeatAndRectify);
         tradeRepeatAndRectify.setText("Repeat and Rectify");
         modeMenu.add(tradeRepeatAndRectify);
@@ -997,6 +1010,7 @@ public class TradingDialog extends javax.swing.JDialog implements TradeListener,
     }//GEN-LAST:event_tempoSliderStateChanged
     
     boolean passiveTrading = false;
+    private Score score;
     
     public void startPassiveTrading() {
         startOrStopTradingButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imp/gui/graphics/toolbar/stop.gif")));
@@ -1365,6 +1379,12 @@ public boolean passiveSelected()
             case "Repeat":
                 tradeMode = new RepeatTRM(newMode);
                 break;
+            case "Jim Trade Mode":
+                tradeMode = new JimTRM(newMode);
+                break;
+            case "Chordify":
+                tradeMode = new ChordifyTRM(notate.getScore(), newMode);
+                break;
             case "Repeat and Rectify":
                 tradeMode = new RepeatAndRectifyTRM(newMode);
                 break;
@@ -1697,6 +1717,8 @@ public boolean passiveSelected()
     private javax.swing.JMenuItem tradePlayMenuItem;
     private javax.swing.JRadioButtonMenuItem tradeRandomModify;
     private javax.swing.JRadioButtonMenuItem tradeRepeat;
+    private JRadioButtonMenuItem tradeJim;
+    private JRadioButtonMenuItem tradeChordify;
     private javax.swing.JRadioButtonMenuItem tradeRepeatAndRectify;
     private javax.swing.JMenuItem tradeStopMenuItem;
     private javax.swing.JRadioButtonMenuItem tradeStore;

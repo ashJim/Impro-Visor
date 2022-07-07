@@ -346,6 +346,7 @@ private ImproVisor(String leadsheet)
 
     // Create a score with default measures in default meter
     Score score = new Score(Notate.DEFAULT_BARS_PER_PART * (BEAT * DEFAULT_METRE[0]));
+    // score.getChordProg().setChord(0, new Chord("C"));
 
     String fontSizePref = Preferences.getPreference(Preferences.DEFAULT_CHORD_FONT_SIZE);
 
@@ -373,18 +374,18 @@ private ImproVisor(String leadsheet)
     
     // Load most recent file, if there is one.
 
-    recFiles = new RecentFiles();
-    String pathName = recFiles.getMostRecentNonGeneratedFile(); // was getFirstPathName
+    // recFiles = new RecentFiles();
+    // String pathName = recFiles.getMostRecentNonGeneratedFile(); // was getFirstPathName
     
-    if( pathName != null )
-      {
-        File f = new File(pathName);
+    // if( pathName != null )
+    //   {
+    //     File f = new File(pathName);
         
-        if( f.exists() )
-          {
-            notate.setupLeadsheet(f, false);
-          }
-      }
+    //     if( f.exists() )
+    //       {
+    //         notate.setupLeadsheet(f, false);
+    //       }
+    //   }
     
      notate.makeVisible(createRoadMap);
 
@@ -522,11 +523,12 @@ public AutomaticVoicingSettings getAVS(){
  */
 
 public static File getUserDirectory()
-  {
+{
+  // Get the name of the user's home directory
   String userHome = System.getProperty("user.home");
   //System.out.println("User Home Path: "+ userHome);
 
-
+  
   File homeDir = new File(userHome, Directories.improHome);
     
   if( !homeDir.exists() )
@@ -536,7 +538,7 @@ public static File getUserDirectory()
     }
   
   return homeDir;
-  }
+}
 
 public static void openFirstTimeDialog(Notate notate)
   {

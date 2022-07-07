@@ -161,7 +161,7 @@ public void execute()
                 if( currentNote.isRest() )
                   {
                       //was used to disallow repeated notes
-                    //previouslyResolved = null;
+                      //previouslyResolved = null;8
                   }
                 else
                   {

@@ -255,6 +255,7 @@ public class Score implements Constants, Serializable {
         
         this.partList = new PartList(1);
         this.chordProg = new ChordPart();
+
         
         setScoreItemsFromPreferences();
     }

@@ -709,7 +709,10 @@ public class ActiveTrading {
           {
             return; // shouldn't happen, but prevent divide by 0 later
           }
-        notifyListeners(true);
+        
+        // without this, the start trading button stays on the screen during trading, 
+        //instead of being replaced by the stop button.  
+        notifyListeners(true); 
         //System.out.println("slotsPerChorus = " + slotsPerChorus);
         //make this more general
         File directory = ImproVisor.getTransformDirectory();

@@ -25,6 +25,8 @@ import imp.ImproVisor;
 import imp.generalCluster.CreateGrammar;
 import imp.generalCluster.DataPoint;
 import imp.com.CommandManager;
+import imp.com.EveryNoteIsCCommand;
+import imp.com.ChordifyCommand;
 import imp.com.InvertCommand;
 import imp.com.RectifyPitchesCommand;
 import imp.com.ReverseCommand;
@@ -36,6 +38,7 @@ import imp.guidetone.GuideLineGenerator;
 import imp.data.MelodyPart;
 import imp.data.Note;
 import imp.data.RhythmCluster;
+import imp.data.Score;
 import imp.generalCluster.Centroid;
 import imp.generalCluster.metrics.Metric;
 import imp.generalCluster.metrics.MetricListFactories.DefaultMetricListFactory;
@@ -1033,7 +1036,9 @@ public class TradingResponseInfo {
     
     }
  
-
+    public void testMessage() {
+        System.out.println("test message generated");
+    }
 
     public void lookupAndPlay() {
         MelodyPart[] parts = chopResponse();
@@ -1350,7 +1355,25 @@ public class TradingResponseInfo {
         ReverseCommand cmd = new ReverseCommand(response, start, stop, false);
         cmd.execute();
     }
+
+    public void everyNoteIsC() {
+        EveryNoteIsCCommand cmd = new EveryNoteIsCCommand(response, start, stop, false);
+        cmd.execute();
+    }
     
+    public void chordify(Score score) {
+        // Chord lastChord = new Chord("C");
+        // Chord thisChord = new Chord("G");
+        // if(score.getChordProg().getChord(stop).equals(lastChord)) {
+        //     score.getChordProg().setChord(stop + 1, thisChord);
+        // } else {
+        //     score.getChordProg().setChord(stop + 1, lastChord);
+        // }
+        
+        ChordifyCommand cmd = new ChordifyCommand(responseChords, start, stop, false);
+        cmd.execute();
+    }
+
     //STEP 3 - transform/embellish the solo (in the style of a particular musician)
     
     //transform solo using specified transform
@@ -1426,5 +1449,9 @@ public class TradingResponseInfo {
 
     public int[] getMetre() {
         return this.metre;
+    }
+
+    public ChordPart getChordResponse() {
+        return responseChords;
     }
 }

@@ -20,6 +20,7 @@
 
 package imp.trading.tradingResponseModes;
 
+import imp.data.ChordPart;
 import imp.data.MelodyPart;
 import imp.data.Rest;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +40,7 @@ public abstract class BlockResponseMode extends TradingResponseMode {
     }
     
     public void onStartTrading() {
-        
+
     }
     
     /**
@@ -75,7 +76,8 @@ public abstract class BlockResponseMode extends TradingResponseMode {
     }
     
     public abstract MelodyPart generateResponse();
-    
-    
-    
+        
+    public ChordPart generateChords() {
+        return responseInfo.getChordResponse();
+    }
 }
