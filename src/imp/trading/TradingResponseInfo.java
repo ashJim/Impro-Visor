@@ -1362,16 +1362,28 @@ public class TradingResponseInfo {
     }
     
     public void chordify(Score score) {
-        // Chord lastChord = new Chord("C");
-        // Chord thisChord = new Chord("G");
-        // if(score.getChordProg().getChord(stop).equals(lastChord)) {
-        //     score.getChordProg().setChord(stop + 1, thisChord);
-        // } else {
-        //     score.getChordProg().setChord(stop + 1, lastChord);
+        String startNote = score.getPart(0).getNote(0).getPitchClassName();
+        String nextNote = score.getPart(0).getNote(60).getPitchClassName();
+        
+        if(startNote.equals("c") || nextNote.equals("c")) {
+            score.getChordProg().setChord(0, new Chord("C"));
+        }
+        if(startNote.equals("g") || nextNote.equals("g")) {
+            score.getChordProg().setChord(0, new Chord("G"));
+        }
+
+        tradingDialog.stopActiveTrading();
+        // if(startNote.equals("r")) {
+        //     score.getChordProg().setChord(0, new Chord("A"));
+        // }
+
+        // score.getChordProg().setChord(0, new Chord("G"));
+        // if(score.getChordProg().getChord(0).getName().equals("G")) {
+        //     score.getChordProg().setChord(stop + 1, new Chord("C"));
         // }
         
-        ChordifyCommand cmd = new ChordifyCommand(responseChords, start, stop, false);
-        cmd.execute();
+        // ChordifyCommand cmd = new ChordifyCommand(responseChords, start, stop, false);
+        // cmd.execute();
     }
 
     //STEP 3 - transform/embellish the solo (in the style of a particular musician)

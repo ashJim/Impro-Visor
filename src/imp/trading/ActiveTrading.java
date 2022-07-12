@@ -31,6 +31,7 @@ import imp.style.Style;
 import imp.gui.Notate;
 import imp.lickgen.transformations.Transform;
 import imp.midi.MidiManager;
+import imp.trading.tradingResponseModes.ChordifyTRM;
 import imp.trading.tradingResponseModes.CorrectRhythmTRM;
 import imp.trading.tradingResponseModes.TradingResponseMode;
 import imp.util.TransformFilter;
@@ -704,6 +705,16 @@ public class ActiveTrading {
      */
     public void startTrading()
     {
+        if(tradeMode instanceof ChordifyTRM) {
+          ChordPart myPart = notate.getScore().getChordProg();
+          for(int i = 0; i < myPart.getSize(); i++) {
+            if(myPart.getChord(i) != null && !myPart.getChord(i).getName().equals("NA")) {
+              myPart.delUnit(i);  
+            }
+          }
+        }
+        
+
         slotsPerChorus = notate.getSlotsPerChorus();
         if( slotsPerChorus == 0 )
           {
