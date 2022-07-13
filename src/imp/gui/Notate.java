@@ -282,6 +282,10 @@ private int measureLength = 4 * BEAT;
  */
 protected Score score;
 /**
+ * The Reharm for chord reharmonisation
+ */
+private Reharm reharm;
+/**
  * An array of Parts in the Score to be displayed
  */
 protected PartList partList;
@@ -11573,71 +11577,17 @@ public void stopRecording()
   }
 
 public void reharm() {
-
-    HashMap<String, String> chords = getDiatonicChords(score.getKeySignature());
-
-    System.out.println(chords.get("d"));
-
-    for(int i = 0; i < score.getPart(0).size() ; i = i + score.getSlotsPerMeasure()) {
-        MelodyPart targetPart = score.getPart(0);
-        if(targetPart == null) return;
-
-        Note targetNote = targetPart.getNote(i);
-        if(targetNote == null) continue;
-
-        String targetNoteName = targetNote.getPitchClassName();
-
-        if(chords.containsKey(targetNoteName)) {
-            score.getChordProg().setChord(i, new Chord(chords.get(targetNoteName)));
-        }
-        
-        // if(targetNoteName.equals("c")) {
-        //     score.getChordProg().setChord(i, new Chord("C"));
-        // }
-        // if(targetNoteName.equals("g")) {
-        //     score.getChordProg().setChord(i, new Chord("G"));
-        // }
-        // if(targetNoteName.equals("f")) {
-        //     score.getChordProg().setChord(i, new Chord("F"));
-        // }
-    }
-
+    reharm = getReharmInstance();
+    reharm.execute();
     repaint();
 }
 
-private HashMap<String, String> getDiatonicChords(int keySig) {
-
-    // HashMap<String, HashMap<String, String>> keys = new HashMap<>();
-
-
-
-    // return keys;
-
-    HashMap<String, String> keyChords = new HashMap<>();
-
-    switch(keySig) {
-        case 1:
-            keyChords.put("g", "G");
-            keyChords.put("a", "Am");
-            keyChords.put("b", "Bm");
-            keyChords.put("c", "C");
-            keyChords.put("d", "D");
-            keyChords.put("e", "Em");
-            keyChords.put("f#", "F#m7b5");
-            break;
-        default:
-            keyChords.put("c", "C");
-            keyChords.put("d", "Dm");
-            keyChords.put("e", "Em");
-            keyChords.put("f", "F");
-            keyChords.put("g", "G");
-            keyChords.put("a", "Am");
-            keyChords.put("b", "Bm7b5");
-            break;
-    }
-
-    return keyChords;
-
+/**
+ * Gets the Reharm instance, or creates it if null.
+ */
+public Reharm getReharmInstance() {
+    if(reharm == null) reharm = new BasicReharm(score);
+    return reharm;
 }
 
 /**
