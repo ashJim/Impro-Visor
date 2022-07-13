@@ -7,30 +7,6 @@ public class BasicReharm extends Reharm {
     public BasicReharm(Score score) {
         super(score);
     }
-    
-    /**
-     * Does some basic reharmonisation using just the root chords at the beginning of each bar.
-     */
-    @Override
-    public void execute() {
-        generateChords(score.getKeySignature());
-
-        for(int i = 0; i < score.getPart(0).size() ; i = i + score.getSlotsPerMeasure()) {
-            MelodyPart targetPart = score.getPart(0);
-            if(targetPart == null) return;
-    
-            Note targetNote = targetPart.getNote(i);
-            if(targetNote == null) continue;
-    
-            String targetNoteName = targetNote.getPitchClassName();
-    
-            if(keyChords.containsKey(targetNoteName)) {
-                String[] chordChoice = keyChords.get(targetNoteName);
-                String chord = chordChoice[0];
-                score.getChordProg().setChord(i, new Chord(chord));
-            }
-        }
-    }
 
     /**
      * Generates a set of diatonic chords for the current key signature of the score.
