@@ -1962,6 +1962,7 @@ public Critic getCritic()
         noteCursorBtn = new javax.swing.JButton();
         showAdviceButton = new javax.swing.JToggleButton();
         improviseButton = new javax.swing.JToggleButton();
+        reharmoniseButton = new javax.swing.JToggleButton();
         generationGapSpinner = new javax.swing.JSpinner();
         colorationButton = new javax.swing.JToggleButton();
         smartEntryButton = new javax.swing.JToggleButton();
@@ -7524,6 +7525,28 @@ public Critic getCritic()
         });
         standardToolbar.add(improviseButton);
 
+        reharmoniseButton.setBackground(new java.awt.Color(100, 100, 255));
+        reharmoniseButton.setText("Reharm");
+        reharmoniseButton.setToolTipText("Press to start chord reharmonisation.");
+        reharmoniseButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        reharmoniseButton.setFocusable(false);
+        reharmoniseButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        reharmoniseButton.setIconTextGap(0);
+        reharmoniseButton.setMaximumSize(new java.awt.Dimension(60, 30));
+        reharmoniseButton.setMinimumSize(new java.awt.Dimension(60, 30));
+        reharmoniseButton.setOpaque(true);
+        reharmoniseButton.setPreferredSize(new java.awt.Dimension(50, 30));
+        reharmoniseButton.setRequestFocusEnabled(false);
+        reharmoniseButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        reharmoniseButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                reharmoniseButtonActionPerformed(evt);
+            }
+        });
+        standardToolbar.add(reharmoniseButton);
+
         generationGapSpinner.setModel(new javax.swing.SpinnerNumberModel(4.0d, -20.0d, 20.0d, 0.01d));
         generationGapSpinner.setToolTipText("Specifies the lead time, in beats, for generating next chorus before the end of the current chorus.");
         generationGapSpinner.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Lead", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 0, 10))); // NOI18N
@@ -11548,6 +11571,74 @@ public void stopRecording()
     
     requestFocusInWindow();
   }
+
+public void reharm() {
+
+    HashMap<String, String> chords = getDiatonicChords(score.getKeySignature());
+
+    System.out.println(chords.get("d"));
+
+    for(int i = 0; i < score.getPart(0).size() ; i = i + score.getSlotsPerMeasure()) {
+        MelodyPart targetPart = score.getPart(0);
+        if(targetPart == null) return;
+
+        Note targetNote = targetPart.getNote(i);
+        if(targetNote == null) continue;
+
+        String targetNoteName = targetNote.getPitchClassName();
+
+        if(chords.containsKey(targetNoteName)) {
+            score.getChordProg().setChord(i, new Chord(chords.get(targetNoteName)));
+        }
+        
+        // if(targetNoteName.equals("c")) {
+        //     score.getChordProg().setChord(i, new Chord("C"));
+        // }
+        // if(targetNoteName.equals("g")) {
+        //     score.getChordProg().setChord(i, new Chord("G"));
+        // }
+        // if(targetNoteName.equals("f")) {
+        //     score.getChordProg().setChord(i, new Chord("F"));
+        // }
+    }
+
+    repaint();
+}
+
+private HashMap<String, String> getDiatonicChords(int keySig) {
+
+    // HashMap<String, HashMap<String, String>> keys = new HashMap<>();
+
+
+
+    // return keys;
+
+    HashMap<String, String> keyChords = new HashMap<>();
+
+    switch(keySig) {
+        case 1:
+            keyChords.put("g", "G");
+            keyChords.put("a", "Am");
+            keyChords.put("b", "Bm");
+            keyChords.put("c", "C");
+            keyChords.put("d", "D");
+            keyChords.put("e", "Em");
+            keyChords.put("f#", "F#m7b5");
+            break;
+        default:
+            keyChords.put("c", "C");
+            keyChords.put("d", "Dm");
+            keyChords.put("e", "Em");
+            keyChords.put("f", "F");
+            keyChords.put("g", "G");
+            keyChords.put("a", "Am");
+            keyChords.put("b", "Bm7b5");
+            break;
+    }
+
+    return keyChords;
+
+}
 
 /**
  * Starts recording: registers the midiRecorder and changes the mode.
@@ -23561,6 +23652,10 @@ private void improviseButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN
       improviseButtonToggled(improviseButton.isSelected());
   }//GEN-LAST:event_improviseButtonActionPerformed
 
+private void reharmoniseButtonActionPerformed(ActionEvent evt) {
+    reharm();
+}
+
 private void importMidiMIActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_importMidiMIActionPerformed
   {//GEN-HEADEREND:event_importMidiMIActionPerformed
       importMIDI();
@@ -27409,6 +27504,7 @@ private ImageIcon pauseButton =
     private javax.swing.JPopupMenu.Separator improvSeparator2;
     private javax.swing.JPopupMenu.Separator improvSeparator3;
     private javax.swing.JToggleButton improviseButton;
+    private javax.swing.JToggleButton reharmoniseButton;
     private javax.swing.JToggleButton inChannel1;
     private javax.swing.JToggleButton inChannel10;
     private javax.swing.JToggleButton inChannel11;
