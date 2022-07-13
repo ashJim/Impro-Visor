@@ -8,58 +8,8 @@ public class BasicReharm extends Reharm {
         super(score);
     }
 
-    /**
-     * Generates a set of diatonic chords for the current key signature of the score.
-     */
     @Override
-    public void generateChords(int keySig) {
-        keyChords = new HashMap<>();
-
-        switch(keySig) {
-            case GBMAJOR:    // Key: Gb maj
-                keyChords = generateGFlatChords();
-                break;
-            case DBMAJOR:    // Key: Db maj
-                keyChords = generateDFlatChords();
-                break;
-            case ABMAJOR:    // Key: Ab maj
-                keyChords = generateAFlatChords();
-                break;
-            case EBMAJOR:    // Key: Eb maj
-                keyChords = generateEFlatChords();
-                break;
-            case BBMAJOR:    // Key: Bb maj
-                keyChords = generateBFlatChords();
-                break;
-            case FMAJOR:    // Key: F maj
-                keyChords = generateFChords();
-                break;
-            case GMAJOR:     // Key: G maj
-                keyChords = generateGChords();
-                break;
-            case DMAJOR:     // Key: D maj
-                keyChords = generateDChords();
-                break;
-            case AMAJOR:     // Key: A maj
-                keyChords = generateAChords();
-                break;
-            case EMAJOR:     // Key: E maj
-                keyChords = generateEChords();
-                break;
-            case BMAJOR:     // Key: B maj
-                keyChords = generateBChords();
-                break;
-            case FSMAJOR:     // Key: F# maj
-                keyChords = generateFSharpChords();
-                break;
-            default:    // Key: C maj
-                keyChords = generateCChords();
-                break;
-        }
-
-    }
-
-    private HashMap<String, String[]> generateCChords() {
+    protected HashMap<String, String[]> generateCChords() {
         HashMap<String, String[]> cChords = new HashMap<>();
 
         String[] Array1 = {"C"};
@@ -81,8 +31,8 @@ public class BasicReharm extends Reharm {
         return cChords;
     }
 
-
-    private HashMap<String, String[]> generateFSharpChords() {
+    @Override
+    protected HashMap<String, String[]> generateFSharpChords() {
         HashMap<String, String[]> fSharpChords = new HashMap<>();
 
         String[] Array1 = {"F#"};
@@ -104,8 +54,8 @@ public class BasicReharm extends Reharm {
         return fSharpChords;
     }
 
-
-    private HashMap<String, String[]> generateBChords() {
+    @Override
+    protected HashMap<String, String[]> generateBChords() {
         HashMap<String, String[]> bChords = new HashMap<>();
 
         String[] Array1 = {"B"};
@@ -127,8 +77,8 @@ public class BasicReharm extends Reharm {
         return bChords;
     }
 
-
-    private HashMap<String, String[]> generateEChords() {
+    @Override
+    protected HashMap<String, String[]> generateEChords() {
         HashMap<String, String[]> eChords = new HashMap<>();
 
         String[] Array1 = {"E"};
@@ -150,8 +100,8 @@ public class BasicReharm extends Reharm {
         return eChords;
     }
 
-
-    private HashMap<String, String[]> generateAChords() {
+    @Override
+    protected HashMap<String, String[]> generateAChords() {
         HashMap<String, String[]> aChords = new HashMap<>();
 
         String[] Array1 = {"A"};
@@ -173,8 +123,8 @@ public class BasicReharm extends Reharm {
         return aChords;
     }
 
-
-    private HashMap<String, String[]> generateDChords() {
+    @Override
+    protected HashMap<String, String[]> generateDChords() {
         HashMap<String, String[]> dChords = new HashMap<>();
 
         String[] Array1 = {"D"};
@@ -196,8 +146,8 @@ public class BasicReharm extends Reharm {
         return dChords;
     }
 
-
-    private HashMap<String, String[]> generateGChords() {
+    @Override
+    protected HashMap<String, String[]> generateGChords() {
         HashMap<String, String[]> gChords = new HashMap<>();
 
         String[] Array1 = {"G"};
@@ -219,8 +169,8 @@ public class BasicReharm extends Reharm {
         return gChords;
     }
 
-
-    private HashMap<String, String[]> generateFChords() {
+    @Override
+    protected HashMap<String, String[]> generateFChords() {
         HashMap<String, String[]> fChords = new HashMap<>();
 
         String[] Array1 = {"F"};
@@ -242,8 +192,8 @@ public class BasicReharm extends Reharm {
         return fChords;
     }
 
-
-    private HashMap<String, String[]> generateBFlatChords() {
+    @Override
+    protected HashMap<String, String[]> generateBFlatChords() {
         HashMap<String, String[]> bFlatChords = new HashMap<>();
 
         String[] Array1 = {"Bb"};
@@ -265,8 +215,8 @@ public class BasicReharm extends Reharm {
         return bFlatChords;
     }
 
-
-    private HashMap<String, String[]> generateEFlatChords() {
+    @Override
+    protected HashMap<String, String[]> generateEFlatChords() {
         HashMap<String, String[]> eFlatChords = new HashMap<>();
 
         String[] Array1 = {"Eb"};
@@ -288,8 +238,8 @@ public class BasicReharm extends Reharm {
         return eFlatChords;
     }
 
-
-    private HashMap<String, String[]> generateAFlatChords() {
+    @Override
+    protected HashMap<String, String[]> generateAFlatChords() {
         HashMap<String, String[]> aFlatChords = new HashMap<>();
 
         String[] Array1 = {"Ab"};
@@ -311,8 +261,8 @@ public class BasicReharm extends Reharm {
         return aFlatChords;
     }
 
-
-    private HashMap<String, String[]> generateDFlatChords() {
+    @Override
+    protected HashMap<String, String[]> generateDFlatChords() {
         HashMap<String, String[]> dFlatChords = new HashMap<>();
 
         String[] Array1 = {"Db"};
@@ -334,8 +284,8 @@ public class BasicReharm extends Reharm {
         return dFlatChords;
     }
 
-
-    private HashMap<String, String[]> generateGFlatChords() {
+    @Override
+    protected HashMap<String, String[]> generateGFlatChords() {
         HashMap<String, String[]> gFlatChords = new HashMap<>();
 
         String[] Array1 = {"Gb"};
