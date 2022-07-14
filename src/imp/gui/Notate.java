@@ -23,6 +23,8 @@ package imp.gui;
 import imp.fractal.FractalFrame;
 import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
+import imp.reharm.BasicReharm;
+import imp.reharm.Reharm;
 import imp.transform.TransformFrame;
 import imp.themeWeaver.ThemeWeaver;
 import imp.style.SectionInfo;
@@ -11576,6 +11578,9 @@ public void stopRecording()
     requestFocusInWindow();
   }
 
+  /**
+   * Called when the reharm button is pushed.
+   */
 public void reharm() {
     reharm = getReharmInstance();
     reharm.execute();
