@@ -1,16 +1,25 @@
 package imp.reharm;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
-import imp.Constants;
 import imp.data.Chord;
 import imp.data.MelodyPart;
 import imp.data.Note;
-import imp.data.Score; 
+import imp.data.Score;
 
-public abstract class Reharm implements Constants {
+public abstract class Reharm {
     
+    /**
+     * Creates a new Reharm instance. Called by subclasses upon their instantiation.
+     * @param score The Score instance that this Reharm instance will reharmonise.
+     */
+    public Reharm(Score score) {
+        this.score = score;
+    }
+
     /**
      * The HashMap of chords diatonic to the given key signature.
      */
@@ -22,163 +31,258 @@ public abstract class Reharm implements Constants {
     protected Score score;
 
     /**
-     * Construct a new Reharm instance.
+     * The MelodyPart instance in the Score to reharmonise.
      */
-    public Reharm(Score score) {
-        this.score = score;
+    protected MelodyPart targetPart;
+
+    /**
+     * The number of slots that each chord will last
+     */
+    int chordDuration;
+
+    /** An array containing String representations of the notes of the C major scale. */
+    String[] cScale         = {"c", "d", "e", "f", "g", "a", "b"};
+    /** An array containing String representations of the notes of the G major scale. */
+    String[] gScale         = {"g", "a", "b", "c", "d", "e", "f#"};
+    /** An array containing String representations of the notes of the D major scale. */
+    String[] dScale         = {"d", "e", "f#", "g", "a", "b", "c#"};
+    /** An array containing String representations of the notes of the A major scale. */
+    String[] aScale         = {"a", "b", "c#", "d", "e", "f#", "g#"};
+    /** An array containing String representations of the notes of the E major scale. */
+    String[] eScale         = {"e", "f#", "g#", "a", "b", "c#", "d#"};
+    /** An array containing String representations of the notes of the B major scale. */
+    String[] bScale         = {"b", "c#", "d#", "e", "f#", "g#", "a#"};
+    /** An array containing String representations of the notes of the F# major scale. */
+    String[] fSharpScale    = {"f#", "g#", "a#", "b", "c#", "d#", "e#"};
+    /** An array containing String representations of the notes of the F major scale. */
+    String[] fScale         = {"f", "g", "a", "bb", "c", "d", "e"};
+    /** An array containing String representations of the notes of the Bb major scale. */
+    String[] bFlatScale     = {"bb", "c", "d", "eb", "f", "g", "a"};
+    /** An array containing String representations of the notes of the Eb major scale. */
+    String[] eFlatScale     = {"eb", "f", "g", "ab", "bb", "c", "d"};
+    /** An array containing String representations of the notes of the Ab major scale. */
+    String[] aFlatScale     = {"ab", "bb", "c", "db", "eb", "f", "g"};
+    /** An array containing String representations of the notes of the Db major scale. */
+    String[] dFlatScale     = {"db", "eb", "f", "gb", "ab", "bb", "c"};
+    /** An array containing String representations of the notes of the Gb major scale. */
+    String[] gFlatScale     = {"gb", "ab", "bb", "cb", "db", "eb", "f"};
+
+    /**
+     * An array of major scales that correspond to the sharp keys. The index of the scale 
+     * in the array indicates the number of sharps that key has (i.e. G major has 1 sharp
+     * so is placed at index 1).
+     */
+    String[][] sharpKeys    = {cScale, gScale, dScale, aScale, eScale, bScale, fSharpScale};
+    /**
+     * An array of major scales that correspond to the flat keys. The index of the scale 
+     * in the array indicates the number of flats that key has (i.e. Gb major has 6 flats
+     * so is placed at index 6).
+     */
+    String[][] flatKeys     = {cScale, fScale, bFlatScale, eFlatScale, aFlatScale, dFlatScale, gFlatScale};
+
+    /**
+     * Use this to match groups of chords to the notes in the scale with which they will fit.
+     * Make and return a 2-dimensional array of Strings taken from the chords parameter.
+     * @param chords The root chords to base the chord groups on.
+     * @return A two-dimensional array of chord groups, each matching the index of a note in the scale.
+     */
+    public abstract String[][] generateSubstitutions(String[] chords);
+    /**
+     * This method sets the frequency at which new chords will be generated. Simply make a call to 
+     * setChordDuration(chordDuration), replacing chordDuration parameter with the required length 
+     * in slots between chords.
+     */
+    public abstract void setChordDuration();
+    /**
+     * This method is run at every point a new chord is to be placed. It details how the 
+     * chord will be picked, based on the keyChords HashMap of notes and suitable chords.
+     * @param chordSlot The slot in which to put a chord. We iterate through the chordSlots 
+     * and implement this method for each.
+     */
+    public abstract void implementChordChoice(int chordSlot);
+
+    /**
+     * Takes a major scale and turns each of its notes into corresponding triad chords.
+     */
+    protected String[] generateRootTriads(String[] scale) {
+        String[] chords = new String[scale.length];
+        for(int i = 0; i < scale.length; i++) {
+            if(i == 1 || i == 2 || i == 5) {
+                chords[i] = scale[i].toUpperCase() + "m";
+            } else if(i == 6) {
+                chords[i] = scale[i].toUpperCase() + "m7b5";
+            } else {
+                chords[i] = scale[i].toUpperCase();
+            } 
+            if(chords[i].length() == 1) continue;
+            if(chords[i].charAt(1) == 'B') {
+                char[] nameArr = chords[i].toCharArray();
+                nameArr[1] = 'b';
+                chords[i] = "";
+                for(char c : nameArr) {
+                    chords[i] += c;
+                }
+            }
+        }
+        return chords;
     }
 
     /**
-     * Executes the reharmonisation of the chords, based on the generated chord set 
-     * in the current key signature. This standard version of the method picks a chord 
-     * at random from the available chords. This could be overridden in subclasses  
-     * requiring more complicated logic.
+     * Sets the keyChords HashMap so that the elements in the notes array become the keys
+     * and the arrays inside the chordSets 2-dimensional array become the values. Keys 
+     * and values are paired together by matching their indexes in their respective arrays.
+     * @param notes The note names that will become the keys.
+     * @param chordSets The arrays of chord names that will become the values.
      */
-    public void execute() {
-        generateChords(score.getKeySignature());
-        // Select the MelodyPart for analysis
-        MelodyPart targetPart = score.getPart(0);
-        if(targetPart == null) return;
-        // For each bar...
-        for(int i = 0; i < targetPart.size() ; i = i + score.getSlotsPerMeasure()) {
-            // Get the note at the beginning of the bar or 
-            // move to the next bar if there is no note.
-            Note targetNote = targetPart.getNote(i);
-            if(targetNote == null) continue;
-            // Get the name of the note at the beginning of the bar
-            String targetNoteName = targetNote.getPitchClassName();
-            // If the note name is the same as one of the keys in the 
-            // keyChords HashMap...
-            if(keyChords.containsKey(targetNoteName)) {
-                // Get the chords that match to this note
-                String[] chordChoices = keyChords.get(targetNoteName);
-                // The chord to be instantiated in this position
-                String chord;
-                // Set up a new Random object.
-                Random random = new Random();
-                // Randomly select between the chords that map to this note.
-                chord = chordChoices[random.nextInt(chordChoices.length)];
-                // Set the chord for this position on the score as decided in logic above
-                score.getChordProg().setChord(i, new Chord(chord));
+    public void setKeyChords(String[] notes, String[][] chordSets) {
+        if(keyChords == null) {
+            keyChords = new HashMap<>();
+        }
+        keyChords.clear();
+        for(int i = 0; i < notes.length && i < chordSets.length; i++) {
+            keyChords.put(notes[i], chordSets[i]);
+        }
+    }
+
+    /**
+     * Sets how many slots will pass before thinking about adding another chord.
+     * Use inside your implementation of setChordDuration() in subclasses.
+     * @param slots the number of slots to wait before trying to add another chord.
+     */
+    public void setChordDuration(int slots) {
+        chordDuration = slots;
+    }
+
+    /**
+     * Generates a set of potential chords for each note in the current key signature of the score.
+     */
+    public void generateChords(int keySig) {
+        if(keySig >= 0) {
+            setKeyChords(sharpKeys[keySig], 
+            generateSubstitutions(generateRootTriads(sharpKeys[keySig])));
+        } else {
+            int absoluteKey = Math.abs(keySig);
+            setKeyChords(flatKeys[absoluteKey], 
+            generateSubstitutions(generateRootTriads(flatKeys[absoluteKey])));
+        }    
+    }
+
+    /**
+     * Returns the name of the note at a given slot number in a given MelodyPart. 
+     * Useful for finding specific notes in implementChordChoice().
+     * @param targetPart The MelodyPart to search in.
+     * @param slot The slot to search at.
+     * @return
+     */
+    public String getNoteNameAtChordSlot(int slot) {
+        // Get the note at the beginning of the bar or 
+        // move to the next bar if there is no note.
+        Note targetNote = targetPart.getNote(slot);
+        if(targetNote == null) return null;
+        // Get the name of the note at the beginning of the bar
+        return targetNote.getPitchClassName();
+    }
+
+    /**
+     * Finds the note at a given slot, selects the first chord from the keyChords 
+     * choices for that note and places it above the note at that slot.
+     * @param targetPart The MelodyPart to add the chord to.
+     * @param slot The slot number at which to analyse the note and place the chord.
+     */
+    public void setRootChordFromNote(int slot) {
+        String targetNoteName = getNoteNameAtChordSlot(slot);
+        if(keyChords.containsKey(targetNoteName)) {
+            // Get the chords that match to this note
+            String[] chordChoices = keyChords.get(targetNoteName);
+            // Select root chord within the key for this note.
+            String chord = chordChoices[0];
+            // Set the chord for this position on the score as decided in logic above
+            score.getChordProg().setChord(slot, new Chord(chord));
+        }
+    }
+
+    /**
+     * Finds the note at a given slot, selects a chord at random from the list 
+     * of suitable choices for that note, then places the chord in that slot.
+     * @param targetPart The MelodyPart to add the chord to.
+     * @param slot The slot number at which to analyse the note and place the chord.
+     */
+    public void setRandomChordFromNote(int slot) {
+        String targetNoteName = getNoteNameAtChordSlot(slot);
+        if(keyChords.containsKey(targetNoteName)) {
+            // Set the chord for this position on the score as decided in logic above
+            score.getChordProg().setChord(slot, getRandomChord(targetNoteName));
+        }
+    }
+
+    public void setRandomChordFromNote(int noteSetFrom, int chordSetTo) {
+        String targetNoteName = getNoteNameAtChordSlot(noteSetFrom);
+        if(keyChords.containsKey(targetNoteName)) {
+            // Set the chord for this position on the score as decided in logic above
+            score.getChordProg().setChord(chordSetTo, getRandomChord(targetNoteName));
+        }
+    }
+
+    public Chord getRandomChord(String noteName) {
+        // Get the chords that match to this note
+        String[] chordChoices = keyChords.get(noteName);
+        // Set up a new Random object.
+        Random random = new Random();
+        // Randomly select between the chords that map to this note.
+        String chordName = chordChoices[random.nextInt(chordChoices.length)];
+        // Return a new Chord with this name
+        return new Chord(chordName);
+    }
+
+    /**
+     * Sets the chord based on the most frequent note during the duration of the chord slot.
+     * If multiple notes tie as most frequent, sets the one that occurs earliest.
+     * @param targetPart
+     * @param slot
+     */
+    public void setRootChordFromCommonNote(int slot) {
+        // a place to store the notes in the bar
+        ArrayList<String> notesInBar = new ArrayList<>();
+        // For each note in that bar...
+        for(int i = slot; i < slot + chordDuration; i++) {
+            // get the note
+            String noteName = getNoteNameAtChordSlot(i);
+            // move on if not a diatonic note
+            if(!keyChords.containsKey(noteName)) continue;
+            // add to notesInBar container
+            notesInBar.add(noteName);
+        }
+        String mostFrequentNote = null;
+        int freq = 0;
+        for(String n : notesInBar) {
+            if(Collections.frequency(notesInBar, n) > freq) {
+                mostFrequentNote = n;
+                freq = Collections.frequency(notesInBar, n);
+            }
+        }
+        String[] chordChoices = keyChords.get(mostFrequentNote);
+        if(chordChoices != null) {
+            String chord = chordChoices[0];
+            // Set the chord for this position on the score as decided in logic above
+            if(chord != null) {
+            score.getChordProg().setChord(slot, new Chord(chord));
             }
         }
     }
 
-
     /**
-     * Generates a set of diatonic chords for the current key signature of the score.
+     * Goes through each bar in the score, implementing chords as defined in generateSubstitutions() 
+     * and implementChordChoice().
      */
-    public void generateChords(int keySig) {
-        keyChords = new HashMap<>();
-
-        switch(keySig) {
-            case GBMAJOR:    // Key: Gb maj
-                keyChords = generateGFlatChords();
-                break;
-            case DBMAJOR:    // Key: Db maj
-                keyChords = generateDFlatChords();
-                break;
-            case ABMAJOR:    // Key: Ab maj
-                keyChords = generateAFlatChords();
-                break;
-            case EBMAJOR:    // Key: Eb maj
-                keyChords = generateEFlatChords();
-                break;
-            case BBMAJOR:    // Key: Bb maj
-                keyChords = generateBFlatChords();
-                break;
-            case FMAJOR:    // Key: F maj
-                keyChords = generateFChords();
-                break;
-            case GMAJOR:     // Key: G maj
-                keyChords = generateGChords();
-                break;
-            case DMAJOR:     // Key: D maj
-                keyChords = generateDChords();
-                break;
-            case AMAJOR:     // Key: A maj
-                keyChords = generateAChords();
-                break;
-            case EMAJOR:     // Key: E maj
-                keyChords = generateEChords();
-                break;
-            case BMAJOR:     // Key: B maj
-                keyChords = generateBChords();
-                break;
-            case FSMAJOR:     // Key: F# maj
-                keyChords = generateFSharpChords();
-                break;
-            default:    // Key: C maj
-                keyChords = generateCChords();
-                break;
+    public void execute() {
+        // Select the MelodyPart for analysis
+        targetPart = score.getPart(0);
+        if(targetPart == null) return;
+        setChordDuration();
+        // For each bar...
+        for(int chordSlot = 0; chordSlot < targetPart.size() ; chordSlot = chordSlot + chordDuration) {
+            implementChordChoice(chordSlot);
         }
-
     }
-
-    /**
-     * Used to map notes to potential chords in the key of C. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateCChords();
-    /**
-     * Used to map notes to potential chords in the key of G. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateGChords();
-    /**
-     * Used to map notes to potential chords in the key of D. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateDChords();
-    /**
-     * Used to map notes to potential chords in the key of A. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateAChords();
-    /**
-     * Used to map notes to potential chords in the key of E. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateEChords();
-    /**
-     * Used to map notes to potential chords in the key of B. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateBChords();
-    /**
-     * Used to map notes to potential chords in the key of F#. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateFSharpChords();
-    /**
-     * Used to map notes to potential chords in the key of F. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateFChords();
-    /**
-     * Used to map notes to potential chords in the key of Bb. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateBFlatChords();
-    /**
-     * Used to map notes to potential chords in the key of Eb. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateEFlatChords();
-    /**
-     * Used to map notes to potential chords in the key of Ab. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateAFlatChords();
-    /**
-     * Used to map notes to potential chords in the key of Db. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateDFlatChords();
-    /**
-     * Used to map notes to potential chords in the key of Gb. Must be 
-     * implemented in Reharm subclasses.
-     */
-    protected abstract HashMap<String, String[]> generateGFlatChords();
 
 }

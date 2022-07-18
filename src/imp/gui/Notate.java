@@ -23,8 +23,9 @@ package imp.gui;
 import imp.fractal.FractalFrame;
 import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
-import imp.reharm.BasicReharm;
 import imp.reharm.Reharm;
+import imp.reharm.BasicReharm;
+import imp.reharm.TritoneSubReharm;
 import imp.transform.TransformFrame;
 import imp.themeWeaver.ThemeWeaver;
 import imp.style.SectionInfo;
@@ -11583,6 +11584,7 @@ public void stopRecording()
    */
 public void reharm() {
     reharm = getReharmInstance();
+    reharm.generateChords(score.getKeySignature());
     reharm.execute();
     repaint();
 }
