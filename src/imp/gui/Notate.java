@@ -11595,7 +11595,7 @@ public void reharm() {
  * Gets the Reharm instance, or creates it if null.
  */
 public Reharm getReharmInstance() {
-    if(reharm == null) reharm = new TritoneSubReharm(score);
+    if(reharm == null) reharm = new OutsideReharm(score);
     return reharm;
 }
 

@@ -145,6 +145,50 @@ public abstract class Reharm {
                 keyChords.put(notes[i], chordSets[i]);
             }
         }
+
+        if(chordSets.length == 12) {
+            // Define the number of semitones between notes of the major scale.
+            int[] intervals = {2, 2, 1, 2, 2, 2};
+            // Match the notes of the major scale to the corresponding chord sets,
+            // leave out the gaps between the major scale notes for now.
+            int i = 0;
+            int j = 0;
+            while(i < notes.length) {
+                keyChords.put(notes[i], chordSets[j]);
+                if(i < 6) j+=intervals[i];
+                i++;
+            }
+            // Fill in the gaps between the major scale notes.
+            for(i = 0, j = 1; i < notes.length; i++, j++) {
+                if(i == 2 || i == 6) { // Case 1: There is no gap between two notes (they are a semitone apart).
+                    j--;
+                    continue;
+                } else if(notes[i].length() == 1) { // Case 2: There is a gap, and the current note is a natural (no sharps or flats).
+                    // add a # symbol to the note and match it to the corresponding chord set.
+                    keyChords.put(notes[i] + "#", chordSets[i+j]);
+                    // get enharmonic equivalent of # note above and match it to the corresponding chord set.
+                    keyChords.put(generateEquivalents().get(notes[i] + "#"), chordSets[i+j]);
+                } else if(notes[i].charAt(1) == '#') { // Case 3: There is a gap, and the current note is a sharp (#).
+                    String newNote = Character.toString(notes[i+1].charAt(0));
+                    keyChords.put(newNote, chordSets[i+j]);
+                } else if(notes[i].charAt(1) == 'b') { // Case 4: There is a gap, and the current note is a flat (b).
+                    String newNote = Character.toString(notes[i].charAt(0));
+                    keyChords.put(newNote, chordSets[i+j]);
+                }
+            }
+        }
+    }
+
+    HashMap<String, String> generateEquivalents() {
+        HashMap<String, String> equivalents = new HashMap<>();
+        equivalents.put("c#", "db");
+        equivalents.put("d#", "eb");
+        equivalents.put("e#", "f");
+        equivalents.put("f#", "gb");
+        equivalents.put("g#", "ab");
+        equivalents.put("a#", "bb");
+        equivalents.put("b#", "c");
+        return equivalents;
     }
 
     /**
