@@ -139,8 +139,11 @@ public abstract class Reharm {
             keyChords = new HashMap<>();
         }
         keyChords.clear();
-        for(int i = 0; i < notes.length && i < chordSets.length; i++) {
-            keyChords.put(notes[i], chordSets[i]);
+        
+        if(chordSets.length == 7) {
+            for(int i = 0; i < notes.length && i < chordSets.length; i++) {
+                keyChords.put(notes[i], chordSets[i]);
+            }
         }
     }
 
@@ -174,7 +177,7 @@ public abstract class Reharm {
      * @param slot The slot to search at.
      * @return
      */
-    public String getNoteNameAtChordSlot(int slot) {
+    public String getNoteNameAtSlot(int slot) {
         // Get the note at the beginning of the bar or 
         // move to the next bar if there is no note.
         Note targetNote = targetPart.getNote(slot);
@@ -190,7 +193,7 @@ public abstract class Reharm {
      * @param slot The slot number at which to analyse the note and place the chord.
      */
     public void setRootChordFromNote(int slot) {
-        String targetNoteName = getNoteNameAtChordSlot(slot);
+        String targetNoteName = getNoteNameAtSlot(slot);
         if(keyChords.containsKey(targetNoteName)) {
             // Get the chords that match to this note
             String[] chordChoices = keyChords.get(targetNoteName);
@@ -208,7 +211,7 @@ public abstract class Reharm {
      * @param slot The slot number at which to analyse the note and place the chord.
      */
     public void setRandomChordFromNote(int slot) {
-        String targetNoteName = getNoteNameAtChordSlot(slot);
+        String targetNoteName = getNoteNameAtSlot(slot);
         if(keyChords.containsKey(targetNoteName)) {
             // Set the chord for this position on the score as decided in logic above
             score.getChordProg().setChord(slot, getRandomChord(targetNoteName));
@@ -216,7 +219,7 @@ public abstract class Reharm {
     }
 
     public void setRandomChordFromNote(int noteSetFrom, int chordSetTo) {
-        String targetNoteName = getNoteNameAtChordSlot(noteSetFrom);
+        String targetNoteName = getNoteNameAtSlot(noteSetFrom);
         if(keyChords.containsKey(targetNoteName)) {
             // Set the chord for this position on the score as decided in logic above
             score.getChordProg().setChord(chordSetTo, getRandomChord(targetNoteName));
@@ -246,7 +249,7 @@ public abstract class Reharm {
         // For each note in that bar...
         for(int i = slot; i < slot + chordDuration; i++) {
             // get the note
-            String noteName = getNoteNameAtChordSlot(i);
+            String noteName = getNoteNameAtSlot(i);
             // move on if not a diatonic note
             if(!keyChords.containsKey(noteName)) continue;
             // add to notesInBar container

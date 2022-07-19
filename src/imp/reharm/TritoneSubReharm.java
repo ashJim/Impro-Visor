@@ -12,7 +12,9 @@ public class TritoneSubReharm extends Reharm {
         String[] tritoneChords = new String[7];
         for(int i = 0; i < chords.length; i++) {
             String chord = chords[(i + 3) % 7];
-            if(chord.length() > 1 && chord.charAt(1) == 'b') {
+            if(i == 3) {
+                chord = chord.charAt(0) + "7";
+            } else if(chord.length() > 1 && chord.charAt(1) == 'b') {
                 chord = chord.charAt(0) + "7";
             } else {
                 chord = chord.charAt(0) + "#7";
@@ -24,7 +26,6 @@ public class TritoneSubReharm extends Reharm {
             chordSets[i][0] = chords[i];
             chordSets[i][1] = tritoneChords[i];
         }
-    
         return chordSets;
     }
 
@@ -35,10 +36,10 @@ public class TritoneSubReharm extends Reharm {
 
     @Override
     public void implementChordChoice(int chordSlot) {
-        if(chordSlot % score.getSlotsPerMeasure() == 0) {
+        if(chordSlot % (chordDuration * 2) == 0) {
             setRootChordFromNote(chordSlot);
         } else {
-            setRandomChordFromNote(chordSlot - (score.getSlotsPerMeasure() / 2), chordSlot);
+            setRandomChordFromNote(chordSlot - (chordDuration), chordSlot);
         }
     }
 

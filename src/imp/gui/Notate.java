@@ -25,6 +25,8 @@ import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
 import imp.reharm.Reharm;
 import imp.reharm.BasicReharm;
+import imp.reharm.CommonNoteReharm;
+import imp.reharm.OutsideReharm;
 import imp.reharm.TritoneSubReharm;
 import imp.transform.TransformFrame;
 import imp.themeWeaver.ThemeWeaver;
@@ -11593,7 +11595,7 @@ public void reharm() {
  * Gets the Reharm instance, or creates it if null.
  */
 public Reharm getReharmInstance() {
-    if(reharm == null) reharm = new BasicReharm(score);
+    if(reharm == null) reharm = new TritoneSubReharm(score);
     return reharm;
 }
 
