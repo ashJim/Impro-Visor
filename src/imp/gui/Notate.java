@@ -24,9 +24,10 @@ import imp.fractal.FractalFrame;
 import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
 import imp.reharm.Reharm;
+import imp.reharm.AdvancedReharm;
 import imp.reharm.BasicReharm;
 import imp.reharm.CommonNoteReharm;
-import imp.reharm.OutsideReharm;
+import imp.reharm.DiminishedReharm;
 import imp.reharm.TritoneSubReharm;
 import imp.transform.TransformFrame;
 import imp.themeWeaver.ThemeWeaver;
@@ -11586,7 +11587,7 @@ public void stopRecording()
    */
 public void reharm() {
     reharm = getReharmInstance();
-    reharm.generateChords(score.getKeySignature());
+    reharm.generateChords();
     reharm.execute();
     repaint();
 }
@@ -11595,7 +11596,7 @@ public void reharm() {
  * Gets the Reharm instance, or creates it if null.
  */
 public Reharm getReharmInstance() {
-    if(reharm == null) reharm = new OutsideReharm(score);
+    if(reharm == null) reharm = new AdvancedReharm(score);
     return reharm;
 }
 

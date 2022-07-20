@@ -2,8 +2,8 @@ package imp.reharm;
 
 import imp.data.Score;
 
-public class OutsideReharm extends Reharm {
-    public OutsideReharm(Score score) {
+public class DiminishedReharm extends Reharm {
+    public DiminishedReharm(Score score) {
         super(score);
     }
 
@@ -32,7 +32,7 @@ public class OutsideReharm extends Reharm {
         int[] majorScaleIndices = {0, 2, 4, 5, 7, 9, 11};
         
         for(int outputIndex = 0, majInputIndex = 0, dimInputIndex = 0;
-        outputIndex < chordSets.length ;
+        outputIndex < chordSets.length;
         outputIndex++) {
             boolean inKey = false;
             for(int i = 0; i < majorScaleIndices.length; i++) {

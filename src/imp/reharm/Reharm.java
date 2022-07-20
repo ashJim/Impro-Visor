@@ -191,6 +191,63 @@ public abstract class Reharm {
         return equivalents;
     }
 
+    public int[] getMajorScaleIndices() {
+        return new int[] {0, 2, 4, 5, 7, 9, 11};
+    } 
+
+    public void populateDiatonicChordSets(String[][] destination, int indexToFill, String[] source) {
+        // Populate the destination array with the contents of the source array
+        int[] majorScaleIndices = getMajorScaleIndices();
+        
+        for(int destIndex = 0, sourceIndex = 0; destIndex < destination.length; destIndex++) {
+            boolean inKey = false;
+            for(int i = 0; i < majorScaleIndices.length; i++) {
+                if(destIndex == majorScaleIndices[i]) {
+                    inKey = true;
+                }
+            }
+            // If outputIndex is the same as one of the chords indices...
+            if(inKey) {
+            addToChordSet(destination, destIndex, indexToFill, source, sourceIndex);
+            sourceIndex++;
+            }
+        }          
+    }
+
+    public void populateOutsideChordSets(String[][] destination, int indexToFill, String[] source) {
+        int[] majorScaleIndices = getMajorScaleIndices();
+
+        for(int destIndex = 0, sourceIndex = 0; destIndex < destination.length; destIndex++) {
+            boolean inKey = false;
+            for(int i = 0; i < majorScaleIndices.length; i++) {
+                if(destIndex == majorScaleIndices[i]) {
+                    inKey = true;
+                }
+            }
+            if(!inKey) {
+            addToChordSet(destination, destIndex, indexToFill, source, sourceIndex);
+            sourceIndex++;
+            }
+        }
+    }
+
+    private void addToChordSet(String[][] chordSets, int setIndex, int chordIndex, String[] sourceChords, int sourceIndex) {
+        // If the array at this index is null...
+        if(chordSets[setIndex] == null) {
+            chordSets[setIndex] = new String[1];
+        }
+        // If the index we are trying to fill is out of bounds...
+        else if (chordSets[setIndex].length <= chordIndex) {
+            String[] newArr = new String[chordIndex + 1];
+            for(int i = 0; i < chordSets[setIndex].length; i++) {
+                newArr[i] = chordSets[setIndex][i];
+            }
+            chordSets[setIndex] = newArr;
+        }
+        // Add the new element to the array
+        chordSets[setIndex][chordIndex] = sourceChords[sourceIndex];
+    }
+
     /**
      * Sets how many slots will pass before thinking about adding another chord.
      * Use inside your implementation of setChordDuration() in subclasses.
@@ -203,21 +260,24 @@ public abstract class Reharm {
     /**
      * Generates a set of potential chords for each note in the current key signature of the score.
      */
-    public void generateChords(int keySig) {
+    public void generateChords() {
+        String[] notesInKey = getNotesInKey();
+        setKeyChords(notesInKey, generateSubstitutions(generateRootTriads(notesInKey)));
+    }
+
+    public String[] getNotesInKey() {
+        int keySig = score.getKeySignature();
         if(keySig >= 0) {
-            setKeyChords(sharpKeys[keySig], 
-            generateSubstitutions(generateRootTriads(sharpKeys[keySig])));
+            return sharpKeys[keySig];
         } else {
             int absoluteKey = Math.abs(keySig);
-            setKeyChords(flatKeys[absoluteKey], 
-            generateSubstitutions(generateRootTriads(flatKeys[absoluteKey])));
-        }    
+            return flatKeys[absoluteKey];
+        }
     }
 
     /**
-     * Returns the name of the note at a given slot number in a given MelodyPart. 
+     * Returns the name of the note at a given slot number in the target MelodyPart. 
      * Useful for finding specific notes in implementChordChoice().
-     * @param targetPart The MelodyPart to search in.
      * @param slot The slot to search at.
      * @return
      */
@@ -251,7 +311,6 @@ public abstract class Reharm {
     /**
      * Finds the note at a given slot, selects a chord at random from the list 
      * of suitable choices for that note, then places the chord in that slot.
-     * @param targetPart The MelodyPart to add the chord to.
      * @param slot The slot number at which to analyse the note and place the chord.
      */
     public void setRandomChordFromNote(int slot) {
