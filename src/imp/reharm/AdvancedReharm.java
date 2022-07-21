@@ -1,8 +1,8 @@
 package imp.reharm;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Random;
 
+import imp.data.Chord;
 import imp.data.Score;
 
 public class AdvancedReharm extends Reharm {
@@ -55,10 +55,40 @@ public class AdvancedReharm extends Reharm {
 
     @Override
     public void implementChordChoice(int chordSlot) {
-        List<String> notesInKey = Arrays.asList(getNotesInKey());
         String currentNote = getNoteNameAtSlot(chordSlot);
-        if(notesInKey.contains(currentNote) && !currentNote.equals(getNoteNameAtSlot(chordSlot - chordDuration))) {
-            setRootChordFromNote(chordSlot);
+        // if note is at the beginning of the bar...
+        if(chordSlot % (chordDuration * 2) == 0) {
+            // if note is in key and not the same as the note at the last chord position...
+            if(inKey(currentNote) && !currentNote.equals(getNoteNameAtSlot(chordSlot - chordDuration))) {
+                setRootChordFromNote(chordSlot);
+            }
+            if(!inKey(currentNote)) {
+                setChordFromNote(chordSlot, 0);
+            }
+        }
+        // if note is in the middle of the bar...
+        if(chordSlot % (chordDuration * 2) != 0) {
+            // if note is in key and not the same as the note at the beginning of the bar...
+            if(inKey(currentNote) && !currentNote.equals(getNoteNameAtSlot(chordSlot - chordDuration))) {
+                setRootChordFromNote(chordSlot);
+            }
+            // if note is in key and is the same as the note at the beginning of the bar...
+            if(inKey(currentNote) && currentNote.equals(getNoteNameAtSlot(chordSlot - chordDuration))) {
+                // randomly, either set tritone sub, or either delete chord at position 
+                // or do nothing if there is no chord there
+                Random random = new Random();
+                if(random.nextInt(2) == 1) {
+                    setChordFromNote(chordSlot, 1);
+                } else {
+                    Chord chord = score.getChordProg().getChord(chordSlot);
+                    if(chord != null) {
+                        score.getChordProg().delUnit(chordSlot);
+                    }
+                }
+            }
+            if(!inKey(currentNote)) {
+                setChordFromNote(chordSlot, 0);
+            }
         }
     }
 }

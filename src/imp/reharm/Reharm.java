@@ -1,8 +1,10 @@
 package imp.reharm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import imp.data.Chord;
@@ -179,6 +181,10 @@ public abstract class Reharm {
         }
     }
 
+    
+    /** 
+     * @return HashMap<String, String>
+     */
     HashMap<String, String> generateEquivalents() {
         HashMap<String, String> equivalents = new HashMap<>();
         equivalents.put("c#", "db");
@@ -191,10 +197,20 @@ public abstract class Reharm {
         return equivalents;
     }
 
+    
+    /** 
+     * @return int[]
+     */
     public int[] getMajorScaleIndices() {
         return new int[] {0, 2, 4, 5, 7, 9, 11};
     } 
 
+    
+    /** 
+     * @param destination
+     * @param indexToFill
+     * @param source
+     */
     public void populateDiatonicChordSets(String[][] destination, int indexToFill, String[] source) {
         // Populate the destination array with the contents of the source array
         int[] majorScaleIndices = getMajorScaleIndices();
@@ -214,6 +230,12 @@ public abstract class Reharm {
         }          
     }
 
+    
+    /** 
+     * @param destination
+     * @param indexToFill
+     * @param source
+     */
     public void populateOutsideChordSets(String[][] destination, int indexToFill, String[] source) {
         int[] majorScaleIndices = getMajorScaleIndices();
 
@@ -231,6 +253,14 @@ public abstract class Reharm {
         }
     }
 
+    
+    /** 
+     * @param chordSets
+     * @param setIndex
+     * @param chordIndex
+     * @param sourceChords
+     * @param sourceIndex
+     */
     private void addToChordSet(String[][] chordSets, int setIndex, int chordIndex, String[] sourceChords, int sourceIndex) {
         // If the array at this index is null...
         if(chordSets[setIndex] == null) {
@@ -265,6 +295,31 @@ public abstract class Reharm {
         setKeyChords(notesInKey, generateSubstitutions(generateRootTriads(notesInKey)));
     }
 
+    
+    /** 
+     * @param note
+     * @return String[]
+     */
+    public String[] get7thArpeggio(String note) {
+        // Find the index of the current note in the notes in key
+        String[] notesInKey = getNotesInKey();
+        int indexInKey = 0;
+        for(int i = 0; i < notesInKey.length; i++) {
+            if(notesInKey[i].equals(note)) {
+                indexInKey = i;
+            }
+        }
+        String[] arpeggio = new String[4];
+        for(int i = 0, j = indexInKey; i < 4; i++, j = (j + 2) % 7) {
+            arpeggio[i] = notesInKey[j];
+        }
+        return arpeggio;
+    }
+
+    
+    /** 
+     * @return String[]
+     */
     public String[] getNotesInKey() {
         int keySig = score.getKeySignature();
         if(keySig >= 0) {
@@ -273,6 +328,16 @@ public abstract class Reharm {
             int absoluteKey = Math.abs(keySig);
             return flatKeys[absoluteKey];
         }
+    }
+
+    
+    /** 
+     * @param note
+     * @return boolean
+     */
+    public boolean inKey(String note) {
+        List<String> notesInKey = Arrays.asList(getNotesInKey());
+        return notesInKey.contains(note);
     }
 
     /**
@@ -308,6 +373,23 @@ public abstract class Reharm {
         }
     }
 
+    
+    /** 
+     * @param slotToPlaceChord
+     * @param chordChoiceIndex
+     */
+    public void setChordFromNote(int slotToPlaceChord, int chordChoiceIndex) {
+        String targetNoteName = getNoteNameAtSlot(slotToPlaceChord);
+        if(keyChords.containsKey(targetNoteName)) {
+            // Get the chords that match to this note
+            String[] chordChoices = keyChords.get(targetNoteName);
+            // Select root chord within the key for this note.
+            String chordName = chordChoices[chordChoiceIndex];
+            // Set the chord for this position on the score as decided in logic above
+            score.getChordProg().setChord(slotToPlaceChord, new Chord(chordName));
+        }
+    }
+
     /**
      * Finds the note at a given slot, selects a chord at random from the list 
      * of suitable choices for that note, then places the chord in that slot.
@@ -321,6 +403,11 @@ public abstract class Reharm {
         }
     }
 
+    
+    /** 
+     * @param noteSetFrom
+     * @param chordSetTo
+     */
     public void setRandomChordFromNote(int noteSetFrom, int chordSetTo) {
         String targetNoteName = getNoteNameAtSlot(noteSetFrom);
         if(keyChords.containsKey(targetNoteName)) {
@@ -329,6 +416,11 @@ public abstract class Reharm {
         }
     }
 
+    
+    /** 
+     * @param noteName
+     * @return Chord
+     */
     public Chord getRandomChord(String noteName) {
         // Get the chords that match to this note
         String[] chordChoices = keyChords.get(noteName);
