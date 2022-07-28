@@ -27,11 +27,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+// import javax.xml.parsers.ParserConfigurationException;
+// import javax.xml.parsers.SAXParser;
+// import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.SAXException;
+// import org.xml.sax.SAXException;
 
 /**
  * @author MusicXML routines were contributed by Lasconic (Nicolas Froment) Aug. 15, 2009
@@ -47,28 +47,28 @@ public class ChordDescription {
 
 	public static void load(String path) {
 
-		File file = new File(path);
-		if (file.exists()) {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			SAXParser parser;
-			try {
-				parser = factory.newSAXParser();
-				ChordDescriptionHandler handler = new ChordDescriptionHandler();
-				parser.parse(file, handler);
-				descriptions = handler.getDescriptions();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			ErrorLog.log(ErrorLog.SEVERE, "No MusicXML chord description file at " + path);
-		}
+		// File file = new File(path);
+		// if (file.exists()) {
+		// 	SAXParserFactory factory = SAXParserFactory.newInstance();
+		// 	SAXParser parser;
+		// 	try {
+		// 		parser = factory.newSAXParser();
+		// 		ChordDescriptionHandler handler = new ChordDescriptionHandler();
+		// 		parser.parse(file, handler);
+		// 		descriptions = handler.getDescriptions();
+		// 	} catch (ParserConfigurationException e) {
+		// 		// TODO Auto-generated catch block
+		// 		e.printStackTrace();
+		// 	} catch (SAXException e) {
+		// 		// TODO Auto-generated catch block
+		// 		e.printStackTrace();
+		// 	} catch (IOException e) {
+		// 		// TODO Auto-generated catch block
+		// 		e.printStackTrace();
+		// 	}
+		// } else {
+		// 	ErrorLog.log(ErrorLog.SEVERE, "No MusicXML chord description file at " + path);
+		// }
 	}
 
 	public ChordDescription() {
