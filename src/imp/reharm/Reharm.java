@@ -1014,34 +1014,11 @@ public abstract class Reharm {
 
 
     public void setRandomAlterationOnChordV(int chordSlot) {
-        String[] chordVArr = keyChords.get(getNotesInKey()[4]);
-        String chordV = chordVArr[0];
-        Random random = new Random();
-        String alteration = "";
-        int altChoice = random.nextInt(4);
-        switch(altChoice) {
-            case 0:
-                alteration = "7#5";
-                break;
-            case 1:
-                alteration = "7b5";
-                break;
-            case 2:
-                alteration = "7#9";
-                break;
-            case 3:
-                alteration = "7b9";
-        }
-        if(chordV.length() == 1) {
-            score.getChordProg().setChord(chordSlot, new Chord(chordV + alteration));
-        } else if (chordV.length() > 1) {
-            String chordVSecondChar = chordV.substring(1, 2);
-            if(chordVSecondChar.equals("#") || chordVSecondChar.equals("b")) {
-                score.getChordProg().setChord(chordSlot, new Chord(chordV.substring(0, 2) + alteration));
-            } else {
-                score.getChordProg().setChord(chordSlot, new Chord(chordV.substring(0, 1) + alteration));
-            }
-        }
+
+        String noteV = getNotesInKey()[4];
+        String chordV = keyChords.get(noteV)[0];
+
+        score.getChordProg().setChord(chordSlot, new Chord(random7thAlteration(chordV)));
     }
 
 

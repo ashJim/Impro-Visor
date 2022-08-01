@@ -43,7 +43,7 @@ public class AdvancedReharm extends Reharm {
             if(isChordVthenI(chordSlot - (chordDuration * 2), chordSlot)) {
                 setRandomAlterationOnChordV(chordSlot - chordDuration);
             }
-        } 
+        }
         if(!isStartOfBar(chordSlot)) {
             if(inKey(currentNote)) {
                 Chord prevChord = score.getChordProg().getPrevChord(chordSlot);
