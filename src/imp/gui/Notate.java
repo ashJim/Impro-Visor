@@ -11601,7 +11601,7 @@ public void reharm() {
 }
 
 /**
- * Gets the Reharm instance, or creates it if null.
+ * Gets a new Reharm instance, based on the selection in the Reharm mode pull-down.
  */
 public Reharm getReharmInstance() {
     if(reharmoniseMode.getSelectedItem().equals("Basic")) {

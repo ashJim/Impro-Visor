@@ -1109,49 +1109,43 @@ public abstract class Reharm {
     }
 
 
-    public boolean isChordI(String ourChord) {
-        if(ourChord == null) return false;
-        String chordI = keyChords.get(getNotesInKey()[0])[0];
-        String chordIFirstChar = chordI.substring(0, 1);
-        // If the first char of each is not the same, the chords are different roots
-        String ourChordFirstChar = ourChord.substring(0, 1);
-        if(!ourChordFirstChar.equals(chordIFirstChar)) return false;
-        // If first char is the same and both chord names are 1 char long, they have the same root
-        if(ourChord.length() == 1 && chordI.length() == 1) return true;
-        // If chord I is 1 char long but our chord is longer...
-        if(chordI.length() == 1) {
-            String ourChordSecondChar = ourChord.substring(1, 2);
-            if(ourChordSecondChar.equals("#") || ourChordSecondChar.equals("b")) return false;
-        }
-        // If our chord is 1 char long but chord I is longer...
-        if(ourChord.length() == 1) {
-            String chordISecondChar = chordI.substring(1, 2);
-            if(chordISecondChar.equals("#") || chordISecondChar.equals("b")) return false;
-        }
+    public boolean isChordVthenI(int slotV, int slotI) {
+        
+        Chord checkV = score.getChordProg().getChord(slotV);
+        if(checkV == null || !isChordV(checkV)) return false;
+
+        Chord checkI = score.getChordProg().getChord(slotI);
+        if(checkI == null || !isChordI(checkI)) return false;
+
         return true;
     }
-    
-    
-    public boolean isChordV(String ourChord) {
-        if(ourChord == null) return false;
-        String chordV = keyChords.get(getNotesInKey()[4])[0];
-        String chordVFirstChar = chordV.substring(0, 1);
-        // If the first char of each is not the same, the chords are different roots
-        String ourChordFirstChar = ourChord.substring(0, 1);
-        if(!ourChordFirstChar.equals(chordVFirstChar)) return false;
-        // If first char is the same and both chord names are 1 char long, they have the same root
-        if(ourChord.length() == 1 && chordV.length() == 1) return true;
-        // If chord V is 1 char long but our chord is longer...
-        if(chordV.length() == 1) {
-            String ourChordSecondChar = ourChord.substring(1, 2);
-            if(ourChordSecondChar.equals("#") || ourChordSecondChar.equals("b")) return false;
-        }
-        // If our chord is 1 char long but chord V is longer...
-        if(ourChord.length() == 1) {
-            String chordVSecondChar = chordV.substring(1, 2);
-            if(chordVSecondChar.equals("#") || chordVSecondChar.equals("b")) return false;
-        }
+
+
+    public boolean isChordV(Chord chord) {
+        
+        if(chord == null) return false;
+
+        String chordRoot = getRoot(chord.getName());
+        String vRoot = getNotesInKey()[4];
+
+        if(!chordRoot.equals(vRoot)) return false;
+
         return true;
+
+    }
+
+
+    public boolean isChordI(Chord chord) {
+        
+        if(chord == null) return false;
+
+        String chordRoot = getRoot(chord.getName());
+        String vRoot = getNotesInKey()[0];
+
+        if(!chordRoot.equals(vRoot)) return false;
+
+        return true;
+
     }
 
 
