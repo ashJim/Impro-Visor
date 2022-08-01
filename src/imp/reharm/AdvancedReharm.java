@@ -41,7 +41,7 @@ public class AdvancedReharm extends Reharm {
                 setDiminishedChord(chordSlot);
             }
             if(isChordVthenI(chordSlot - (chordDuration * 2), chordSlot)) {
-                setRandomAlterationOnChordV(chordSlot - chordDuration);
+                setAlteredChordV(chordSlot - chordDuration);
             }
         }
         if(!isStartOfBar(chordSlot)) {

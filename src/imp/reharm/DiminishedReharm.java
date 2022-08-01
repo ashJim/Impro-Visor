@@ -60,6 +60,6 @@ public class DiminishedReharm extends Reharm {
 
     @Override
     public void implementChordChoice(int chordSlot) {
-        setRootChordFromNote(chordSlot);        
+        setRootChord(chordSlot);        
     }
 }

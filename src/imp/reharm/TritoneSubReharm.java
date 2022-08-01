@@ -37,7 +37,7 @@ public class TritoneSubReharm extends Reharm {
     @Override
     public void implementChordChoice(int chordSlot) {
         if(chordSlot % (chordDuration * 2) == 0) {
-            setRootChordFromNote(chordSlot);
+            setRootChord(chordSlot);
         } else {
             setRandomChordFromNote(chordSlot - (chordDuration), chordSlot);
         }

@@ -137,12 +137,25 @@ public abstract class Reharm {
 
     /* Useful in generateSubstitutions() */
 
-
+    /**
+     * Generates an empty array to hold potential chord choice names for each of the 7 diatonic notes 
+     * in the current key. Each index matches up to the corresponding note in the major scale for
+     * the key, but zero-indexed (e.g. chords to be paired with note 1 in scale are placed in the 
+     * array at index 0, etc.)
+     * @return The empty array, to be filled with String arrays of appropriate chord names.
+     */
     public String[][] diatonicChordSets() {
         return new String[7][];
     }
 
 
+    /**
+     * Generates an empty array to hold potential chord choice names for each of the 12 chromatic notes 
+     * in the current key. Each index matches up to the corresponding note in the chromatic scale for
+     * the key, but zero-indexed (e.g. in the key of C, chords to be paired with the note C are placed 
+     * at index 0 and those that go with Db are placed at index 1,  etc.)
+     * @return The empty array, to be filled with String arrays of appropriate chord names.
+     */
     public String[][] chromaticChordSets() {
         return new String[12][];
     }
@@ -151,7 +164,7 @@ public abstract class Reharm {
     /**
      * Sets the keyChords HashMap so that the elements in the notes array become the keys
      * and the arrays inside the chordSets 2-dimensional array become the values. Keys 
-     * and values are paired together by matching the indexes in their respective arrays.
+     * and values are paired together by matching the indices in their respective arrays.
      * @param notes The note names that will become the keys.
      * @param chordSets The arrays of chord names that will become the values.
      */
@@ -242,6 +255,9 @@ public abstract class Reharm {
      * @param source The chords to use to populate the destination chordSets array.
      */
     public void populateOutsideChordSets(String[][] destination, int indexToFill, String[] source) {
+        // Do not allow this method to complete if user has not given a chromatic chordSets destination array of length 12
+        if(destination.length != 12) return;
+
         int[] majorScaleIndices = getMajorScaleIndices();
 
         for(int destIndex = 0, sourceIndex = 0; destIndex < destination.length; destIndex++) {
@@ -259,6 +275,10 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Adds all the default chord names to the default positions to the chordSets array.
+     * @param chordSets The array to add chord names to.
+     */
     public void initStandardSubstitutions(String[][] chordSets) {
         addDiatonicChords(chordSets);
         addTritoneSubs(chordSets);
@@ -267,11 +287,19 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Pairs the corresponding diatonic chords with the notes in the major scale in the current key. 
+     * @param chordSets The array to add chord names to.
+     */
     public void addDiatonicChords(String[][] chordSets) {
         populateDiatonicChordSets(chordSets, 0, generateRootTriads(getNotesInKey()));
     }
 
     
+    /**
+     * Pairs the corresponding tritone substitutions with the notes in the major scale in the current key. 
+     * @param chordSets The array to add chord names to.
+     */
     public void addTritoneSubs(String[][] chordSets) {
         // Create an array of tritone substitutions to add to chordSets later.
         String[] tritoneChords = generateTritoneSubs();
@@ -280,6 +308,10 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Pairs the corresponding harmonic substitutions with the notes in the major scale in the current key. 
+     * @param chordSets The array to add chord names to.
+     */
     public void addHarmonicSubs(String[][] chordSets) {
         if(chordSets.length == 7) {
             addToChordSet(chordSets, 0, 2, generateRootTriads(getNotesInKey())[2]);
@@ -308,6 +340,10 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Pairs the corresponding diminished chords with the notes that fall outside the current key. 
+     * @param chordSets The array to add chord names to.
+     */
     public void addDimChords(String[][] chordSets) {
         // Create diminished chords for the non-diatonic positions of the chordSets array.
         String[] dimChords = generateNonDiatonicDimChords();
@@ -317,9 +353,8 @@ public abstract class Reharm {
 
 
     /**
-     * Analyses the given chords array and creates a new chord array of 
-     * tritone substitution triads based on those chords.
-     * @param chords The chords to base the tritone substitutions on.
+     * Analyses the diatonic chords of the current key and creates a new 
+     * chord array of tritone substitution triads based on those chords.
      * @return An array of tritone substitutions for the given chords.
      */
     public String[] generateTritoneSubs() {
@@ -357,6 +392,11 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Creates a new chord array of diminished 7th chords based on the chromatic notes outside of 
+     * the current key.
+     * @return An array of diminished chords based on all notes outside of the current key.
+     */
     public String[] generateNonDiatonicDimChords() {
         String[] dimChords = new String[5];
         String[] diatonicChords = generateRootTriads(getNotesInKey());
@@ -393,12 +433,21 @@ public abstract class Reharm {
 
     /* Useful in implementChordChoice() */
     
-
+    /**
+     * Checks whether the given slot is at the start of a bar.
+     * @param slot The slot to check.
+     * @return True if slot is at the start of the bar, false otherwise.
+     */
     public boolean isStartOfBar(int slot) {
         return slot % score.getSlotsPerMeasure() == 0;
     }
 
 
+    /**
+     * Gets the root note associated with a given chord.
+     * @param chord The name of the chord to get the root note for.
+     * @return The name of the root note of the chord.
+     */
     public String getRoot(String chord) {
         // Get the root note of the chord
         String root = "";
@@ -464,49 +513,11 @@ public abstract class Reharm {
     }
 
 
-    public void setRandomExtensionOn7thChord(String noteToSetChordFrom, int chordChoice, int chordSlot) {
-        String oldChord = keyChords.get(noteToSetChordFrom)[chordChoice];
-        String chordRoot = "";
-        String newChord = "";
-        
-        if(oldChord.length() < 1) {
-            return;
-        } else if(oldChord.length() == 1) {
-            chordRoot = oldChord;
-        }
-        else if(oldChord.charAt(1) == '#' || oldChord.charAt(1) == 'b') {
-            if(oldChord.length() == 2) {
-                chordRoot = oldChord;
-            } else {
-                chordRoot = oldChord.substring(0,2);
-            }
-        } else {
-            chordRoot = oldChord.substring(0, 1);
-        }
-        Random random = new Random();
-        int extChoice = random.nextInt(4);
-        String extension = "";
-        switch(extChoice) {
-            case 0:
-                extension = "7";
-                break;
-            case 1:
-                extension = "9";
-                break;
-            case 2:
-                extension = "11";
-                break;
-            case 3:
-                extension = "13";
-                break;
-        }
-        newChord = chordRoot + extension;
-        if(!newChord.equals("")) {
-            score.getChordProg().setChord(chordSlot, new Chord(newChord));
-        }
-    }
-
-
+    /**
+     * Takes a given chord name and turns it into a dominant chord with a random extension.
+     * @param chord The name of the chord to be manipulated.
+     * @return The new extended chord name.
+     */
     public String random7thExtension(String chord) {
         String root = getRoot(chord).toUpperCase();
         Random random = new Random();
@@ -530,6 +541,11 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Takes a given chord name and turns it into a dominant chord with a random alteration.
+     * @param chord The name of the chord to be manipulated.
+     * @return The new altered chord name.
+     */
     public String random7thAlteration(String chord) {
         String root = getRoot(chord).toUpperCase();
         Random random = new Random();
@@ -553,6 +569,11 @@ public abstract class Reharm {
     }
     
 
+    /**
+     * Takes a given chord name and adds a random extension.
+     * @param chord The name of the chord to be manipulated.
+     * @return The new extended chord name.
+     */
     public String randomExtension(String chord) {
         Random random = new Random();
         int extChoice = random.nextInt(5);
@@ -611,95 +632,23 @@ public abstract class Reharm {
     }
 
 
-    public void setRandomExtensionOnDiatonicChord(String noteToSetChordFrom, int chordChoice, int chordSlot) {
-        // The notes in this key, zero-indexed
-        String[] notesInKey = getNotesInKey();
-        
-        // ignore this method if note is the 7th degree of the scale
-        if(noteToSetChordFrom.equals(notesInKey[6])) return;
-        
-        String[] chordChoices = keyChords.get(noteToSetChordFrom);
-        String chord = chordChoices[chordChoice];
-        
-        Random random = new Random();
-        int extensionChoice = random.nextInt(5);
-
-        // Case 1: we want a standard triad as represented in the choices array.
-        if(extensionChoice == 0) {
-            score.getChordProg().setChord(chordSlot, new Chord(chord));
-        }
-        // Case 2: we want to set the 7th extension of the represented triad.
-        if(extensionChoice == 1) {
-            // check whether major 7th chord is required
-            if(noteToSetChordFrom.equals(notesInKey[0]) || noteToSetChordFrom.equals(notesInKey[3])) {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "M7"));
-            } else {
-                // all others can just have an "7" added to their existing name
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "7"));
-            }
-        }
-        // Case 3: we want to set the 9th extension of the represented triad.
-        if(extensionChoice == 2) {
-            // check for chord III, which should be min7b9 UNRECOGNISED CHORD - DO NOTHING
-            if(noteToSetChordFrom.equals(notesInKey[2])) {
-                setRootChordFromNote(chordSlot);
-            }
-            // check for chord I or IV, which should be maj9
-            else if(noteToSetChordFrom.equals(notesInKey[0]) || noteToSetChordFrom.equals(notesInKey[3])) {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "M9"));
-            } 
-            else {
-                // only remaining options are chords II, V and VI, which 
-                // can just have "9" added to their names respectively.
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "9"));
-            }
-        }
-        // Case 4: we want to set the 11th extension of the represented triad.
-        if(extensionChoice == 3) {
-            // check for chord I, which should be maj11 UNRECOGNISED CHORD - DO NOTHING
-            if(noteToSetChordFrom.equals(notesInKey[0])) {
-                setRootChordFromNote(chordSlot);
-            }
-            // check for chord IV, which should be a maj7#11 chord
-            else if(noteToSetChordFrom.equals(notesInKey[3])) {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "M7#11"));
-            } 
-            // only remaining options are chords II, III, V and VI, which 
-            // can all just have "11" added to their names respectively.
-            else {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "11"));
-            }
-        }
-        // Case 5: we want to set the 13th extension of the represented triad.
-        if(extensionChoice == 4) {
-            // check for chords I and IV, which should both be maj13
-            if(noteToSetChordFrom.equals(notesInKey[0]) || noteToSetChordFrom.equals(notesInKey[3])) {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "M13"));
-            }
-            // check for chords II and V, which can both just have "13" added to their names.
-            else if(noteToSetChordFrom.equals(notesInKey[1]) || noteToSetChordFrom.equals(notesInKey[4])) {
-                score.getChordProg().setChord(chordSlot, new Chord(chord + "13"));
-            }
-            // check for chords III and VI, chich should both be min7b13 UNRECOGNISED CHORD - DO NOTHING
-            else {
-                setRootChordFromNote(chordSlot);
-            }
-        }
-    }
-
-
-    public void setAlteredChordV(int sourceSlot, int destSlot) {
-        String sourceNote = getNoteNameAtSlot(sourceSlot);
-        if(!sourceNote.equals(getNotesInKey()[4])) return;
-        score.getChordProg().setChord(destSlot, new Chord(random7thAlteration(keyChords.get(sourceNote)[0])));
-    }
-
-
+    /**
+     * Sets chord V with an added random alteration in the given slot.
+     * @param slot The slot to set the chord.
+     */
     public void setAlteredChordV(int slot) {
-        setAlteredChordV(slot, slot);
+        String noteV = getNotesInKey()[4];
+        String chordV = keyChords.get(noteV)[0];
+
+        score.getChordProg().setChord(slot, new Chord(random7thAlteration(chordV)));
     }
 
 
+    /**
+     * Gets the tritone substitution of the chord at the given source slot and puts it in the dest slot.
+     * @param sourceSlot The slot with the chord to base the tritone substitution on.
+     * @param destSlot The destination for the tritone substitution chord.
+     */
     public void setTritoneSub(int sourceSlot, int destSlot) {
         String currentNote = getNoteNameAtSlot(sourceSlot);
         // Case 1: current note is not in key
@@ -709,20 +658,12 @@ public abstract class Reharm {
     }
 
 
-    public void setTritoneSub(int slot) {
-        setTritoneSub(slot, slot);
-    }
-
-
-    public void setTritoneSub(String sourceChord, int destSlot) {
-        if(!inKey(getRoot(sourceChord))) return;
-        String[] sourceChordChoices = keyChords.get(getRoot(sourceChord));
-        if(sourceChordChoices.length > 1 && sourceChordChoices[1] != null) {
-            score.getChordProg().setChord(destSlot, new Chord(random7thExtension(keyChords.get(getRoot(sourceChord))[1])));
-        }
-    }
-
-
+    /**
+     * Gets the harmonic substitutions for the diatonic chord based on the note at the source slot 
+     * and sets one at random in the destination slot.
+     * @param sourceSlot The slot that holds the note from which to source the chord choices.
+     * @param destSlot The slot to put the new chord.
+     */
     public void setHarmonicSub(int sourceSlot, int destSlot) {
         String currentNote = getNoteNameAtSlot(sourceSlot);
         // Case 1: current note is not in key
@@ -753,6 +694,11 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Looks at the note in the given slot, gets the harmonic substitutions for the diatonic chord based on 
+     * that note and picks one at random to go in the slot.
+     * @param slot The slot to place the chord.
+     */
     public void setHarmonicSub(int slot) {
         setHarmonicSub(slot, slot);
     }
@@ -789,6 +735,7 @@ public abstract class Reharm {
         return notesInKey.contains(note);
     }
 
+
     /**
      * Returns the name of the note at a given slot number in the target MelodyPart. 
      * Useful for finding specific notes in implementChordChoice().
@@ -804,12 +751,13 @@ public abstract class Reharm {
         return targetNote.getPitchClassName();
     }
 
+
     /**
      * Finds the note at a given slot, selects the first chord from the keyChords 
      * choices for that note and places it above the note at that slot.
      * @param slot The slot number at which to analyse the note and place the chord.
      */
-    public void setRootChordFromNote(int slot) {
+    public void setRootChord(int slot) {
         String targetNoteName = getNoteNameAtSlot(slot);
         if(keyChords.containsKey(targetNoteName) && inKey(targetNoteName)) {
             // Get the chords that match to this note
@@ -822,6 +770,11 @@ public abstract class Reharm {
     }
 
     
+    /**
+     * Finds the note at the given slot and sets its corresponding diminished chord 
+     * in that position on the score. Does nothing if the note is in key.
+     * @param slot The slot to add the chord to.
+     */
     public void setDiminishedChord(int slot) {
         String targetNoteName = getNoteNameAtSlot(slot);
         if(keyChords.containsKey(targetNoteName) && !inKey(targetNoteName)) {
@@ -887,14 +840,14 @@ public abstract class Reharm {
     /** 
      * Looks at the note in the noteSetFrom slot index, selects a chord at random from it's 
      * corresponding chord choices and places that chord at the chordSetTo slot index.
-     * @param noteSetFrom The slot index of the note to use to select a chord.
-     * @param chordSetTo The slot index to place the chord.
+     * @param sourceSlot The slot index of the note to use to select a chord.
+     * @param destSlot The slot index to place the chord.
      */
-    public void setRandomChordFromNote(int noteSetFrom, int chordSetTo) {
-        String targetNoteName = getNoteNameAtSlot(noteSetFrom);
+    public void setRandomChordFromNote(int sourceSlot, int destSlot) {
+        String targetNoteName = getNoteNameAtSlot(sourceSlot);
         if(keyChords.containsKey(targetNoteName)) {
             // Set the chord for this position on the score as decided in logic above
-            score.getChordProg().setChord(chordSetTo, getRandomChord(targetNoteName));
+            score.getChordProg().setChord(destSlot, getRandomChord(targetNoteName));
         }
     }
 
@@ -936,6 +889,12 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Checks whether the given note is a standard chord tone of the given chord, up to the 7th degree.
+     * @param note The name of the note to check.
+     * @param chord The name of the chord to look for the note in.
+     * @return true if note is a chord tone of the chord, false otherwise.
+     */
     public boolean isChordToneOf(String note, String chord) {
         // Get the 7th arpeggio notes of the chord
         String[] arp = get7thArpeggio(chord);
@@ -952,11 +911,16 @@ public abstract class Reharm {
     }
 
 
-    public String mostFrequentNote(int chordSlot) {
+    /**
+     * Returns the most frequently occurring note between the current slot and the next slot.
+     * @param slot The slot to start checking at.
+     * @return The name of the most frequently occurring note between the given slot and the next slot.
+     */
+    public String mostFrequentNote(int slot) {
         // a place to store the notes in the bar
         ArrayList<String> notesInSlot = new ArrayList<>();
         // For each note in that slot...
-        for(int i = chordSlot; i < chordSlot + chordDuration; i++) {
+        for(int i = slot; i < slot + chordDuration; i++) {
             // get the note
             String noteName = getNoteNameAtSlot(i);
             // move on if not an included note
@@ -976,12 +940,17 @@ public abstract class Reharm {
     }
 
 
-    public boolean majorityInKey(int chordSlot) {
+    /**
+     * Checks whether the majority of the notes are in key between a given slot and the next slot.
+     * @param slot The slot to start checking at.
+     * @return true if the majority of the notes between the given slot and the next are in key, false otherwise.
+     */
+    public boolean majorityInKey(int slot) {
         ArrayList<String> inKeyNotes = new ArrayList<>();
         ArrayList<String> outsideNotes = new ArrayList<>();
         
         // For each note in that slot...
-        for(int i = chordSlot; i < chordSlot + chordDuration; i++) {
+        for(int i = slot; i < slot + chordDuration; i++) {
             // get the note
             String noteName = getNoteNameAtSlot(i);
             // move on if not an included note
@@ -1013,91 +982,44 @@ public abstract class Reharm {
     }
 
 
-    public void setRandomAlterationOnChordV(int chordSlot) {
-
-        String noteV = getNotesInKey()[4];
-        String chordV = keyChords.get(noteV)[0];
-
-        score.getChordProg().setChord(chordSlot, new Chord(random7thAlteration(chordV)));
-    }
-
-
+    /**
+     * Checks whether there is a chord at the given slot.
+     * @param slot The slot to check for a chord.
+     * @return true if given slot contains a chord, false otherwise.
+     */
     public boolean hasChord(int slot) {
         if(slot < 0 || slot > score.getChordProg().size() - 1) return false;
         return score.getChordProg().getChord(slot) != null;
     }
 
 
-    public boolean lastChordIsV(int slot) {
-        Chord lastChord = score.getChordProg().getPrevChord(slot);
-        if(lastChord == null) return false;
-        
-        String lastChordName = lastChord.getName();
-        String lastChordFirstChar = lastChordName.substring(0, 1);
-        
-        String[] chordChoices = keyChords.get(getNotesInKey()[4]);
-        String chordV = chordChoices[0];
-        String chordVFirstChar = chordV.substring(0, 1);
-        
-        // If the first char of each is not the same, the chords are different roots
-        if(!lastChordFirstChar.equals(chordVFirstChar)) return false;
-        // If first char is the same and both chord names are 1 char long, they have the same same root
-        if(lastChordName.length() == 1 && chordV.length() == 1) return true;
-        // If chord V is 1 char long but last chord is longer...
-        if(chordV.length() == 1) {
-            String lastChordSecondChar = lastChordName.substring(1, 2);
-            if(lastChordSecondChar.equals("#") || lastChordSecondChar.equals("b")) return false;
-        }
-        // If last chord is 1 char long but chord V is longer...
-        if(lastChordName.length() == 1) {
-            String chordVSecondChar = chordV.substring(1, 2);
-            if(chordVSecondChar.equals("#") || chordVSecondChar.equals("b")) return false;
-        }
-        return true;
-    }
-
-
-    public boolean nextChordIsI(int slot) {
-        Chord nextChord = score.getChordProg().getNextChord(slot);
-        if(nextChord == null) return false;
-        
-        String nextChordName = nextChord.getName();
-        String nextChordFirstChar = nextChordName.substring(0, 1);
-        
-        String[] chordChoices = keyChords.get(getNotesInKey()[0]);
-        String chordI = chordChoices[0];
-        String chordIFirstChar = chordI.substring(0, 1);
-        
-        // If the first char of each is not the same, the chords are different roots
-        if(!nextChordFirstChar.equals(chordIFirstChar)) return false;
-        // If first char is the same and both chord names are 1 char long, they have the same root
-        if(nextChordName.length() == 1 && chordI.length() == 1) return true;
-        // If chord I is 1 char long but next chord is longer...
-        if(chordI.length() == 1) {
-            String nextChordSecondChar = nextChordName.substring(1, 2);
-            if(nextChordSecondChar.equals("#") || nextChordSecondChar.equals("b")) return false;
-        }
-        // If next chord is 1 char long but chord I is longer...
-        if(nextChordName.length() == 1) {
-            String chordISecondChar = chordI.substring(1, 2);
-            if(chordISecondChar.equals("#") || chordISecondChar.equals("b")) return false;
-        }
-        return true;
-    }
-
-
+    /**
+     * Checks whether the given slots contain any variation on chord V and chord I in the key, respectively.
+     * @param slotV The slot to check for chord V.
+     * @param slotI The slot to check for chord I.
+     * @return true if the two slots contain chord V and I respectively, false otherwise.
+     */
     public boolean isChordVthenI(int slotV, int slotI) {
-        
+        // Get the chord contained at slotV
         Chord checkV = score.getChordProg().getChord(slotV);
+        // if there is no chord, or the chord is not a variation of chord V, 
+        // we do not have chord V then I.
         if(checkV == null || !isChordV(checkV)) return false;
-
+        // Get the chord contained at slotI
         Chord checkI = score.getChordProg().getChord(slotI);
+        // if there is no chord, or the chord is not a variation of chord I, 
+        // we do not have chord V then I.
         if(checkI == null || !isChordI(checkI)) return false;
-
+        // Otherwise, we have chord V followed by chord I.
         return true;
     }
 
 
+    /**
+     * Checks whether the given chord is some variation on chord V in the current key.
+     * @param chord The chord to check.
+     * @return true if the given chord is some variation on chord V, false otherwise.
+     */
     public boolean isChordV(Chord chord) {
         
         if(chord == null) return false;
@@ -1112,6 +1034,11 @@ public abstract class Reharm {
     }
 
 
+    /**
+     * Checks whether the given chord is some variation on chord I in the current key.
+     * @param chord The chord to check.
+     * @return true if the given chord is some variation on chord I, false otherwise.
+     */
     public boolean isChordI(Chord chord) {
         
         if(chord == null) return false;

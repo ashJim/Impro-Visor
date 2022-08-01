@@ -30,7 +30,7 @@ public class MediumReharm extends Reharm {
 
         if(isStartOfBar(chordSlot)) {
             if(inKey(currentNote)) {
-                setRootChordFromNote(chordSlot);
+                setRootChord(chordSlot);
             }
             if(!inKey(currentNote)) {
                 setDiminishedChord(chordSlot);
