@@ -40,37 +40,29 @@ public class AdvancedReharm extends Reharm {
             if(!inKey(currentNote)) {
                 setDiminishedChord(chordSlot);
             }
-        } else {
-            if(lastChordIsV(chordSlot) && nextChordIsI(chordSlot)) {
-                Random random = new Random();
-                int choice = random.nextInt(4);
-                if(choice == 0) {
-                    setTritoneSub(chordSlot - chordDuration, chordSlot);
-                } else if(choice == 1) {
-                    setAlteredChordV(chordSlot - chordDuration, chordSlot);
-                } else if(choice == 2) {
-                    setAlteredChordV(chordSlot);
-                }
-            } else {
-                if(inKey(currentNote)) {
-                    Chord prevChord = score.getChordProg().getPrevChord(chordSlot);
-                    if(prevChord != null) {
-                        String prevChordName = prevChord.getName();
-                        if(isChordToneOf(currentNote, prevChordName)) {
-                            Random random = new Random();
-                            if(random.nextInt(2) == 0) {
-                                setTritoneSub(chordSlot - chordDuration, chordSlot);
-                            }
-                        } else {
-                            setHarmonicSub(chordSlot);
+        } 
+        if(!isStartOfBar(chordSlot)) {
+            if(inKey(currentNote)) {
+                Chord prevChord = score.getChordProg().getPrevChord(chordSlot);
+                if(prevChord != null) {
+                    String prevChordName = prevChord.getName();
+                    if(isChordToneOf(currentNote, prevChordName)) {
+                        Random random = new Random();
+                        if(random.nextInt(2) == 0) {
+                            setTritoneSub(chordSlot - chordDuration, chordSlot);
                         }
-                    } else {
+                    } 
+                    if(!isChordToneOf(currentNote, prevChordName)) {
                         setHarmonicSub(chordSlot);
                     }
-                } else {
-                    setDiminishedChord(chordSlot);
+                } 
+                if(prevChord == null) {
+                    setHarmonicSub(chordSlot);
                 }
-            }           
-        }
+            } 
+            if(!inKey(currentNote)) {
+                setDiminishedChord(chordSlot);
+            }
+        }           
     }
 }

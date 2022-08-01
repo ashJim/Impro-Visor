@@ -10,10 +10,8 @@ public class BasicReharm extends Reharm {
 
     @Override
     public String[][] generateSubstitutions(String[] chords) {
-        String[][] chordSets = new String[7][1];
-        for(int i = 0; i < chordSets.length; i++) {
-            chordSets[i][0] = chords[i];
-        }
+        String[][] chordSets = diatonicChordSets();
+        addDiatonicChords(chordSets);
         return chordSets;
     }
 

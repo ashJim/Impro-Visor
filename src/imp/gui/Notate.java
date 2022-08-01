@@ -25,6 +25,7 @@ import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
 import imp.reharm.Reharm;
 import imp.reharm.AdvancedReharm;
+import imp.reharm.MediumReharm;
 import imp.reharm.BasicReharm;
 import imp.reharm.CommonNoteReharm;
 import imp.reharm.DiminishedReharm;
@@ -7557,6 +7558,13 @@ public Critic getCritic()
         });
         standardToolbar.add(reharmoniseButton);
 
+        String[] reharmModes = {"Basic", "Medium", "Advanced"};
+        reharmoniseMode = new javax.swing.JComboBox(reharmModes);
+        reharmoniseMode.setMaximumSize(new java.awt.Dimension(130, 60));
+        reharmoniseMode.setMinimumSize(new java.awt.Dimension(130, 60));
+        reharmoniseMode.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reharm Mode", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 0, 10))); // NOI18N
+        standardToolbar.add(reharmoniseMode);
+
         generationGapSpinner.setModel(new javax.swing.SpinnerNumberModel(4.0d, -20.0d, 20.0d, 0.01d));
         generationGapSpinner.setToolTipText("Specifies the lead time, in beats, for generating next chorus before the end of the current chorus.");
         generationGapSpinner.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Lead", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 0, 10))); // NOI18N
@@ -11596,7 +11604,13 @@ public void reharm() {
  * Gets the Reharm instance, or creates it if null.
  */
 public Reharm getReharmInstance() {
-    if(reharm == null) reharm = new AdvancedReharm(score);
+    if(reharmoniseMode.getSelectedItem().equals("Basic")) {
+            reharm = new BasicReharm(score);
+    } else if(reharmoniseMode.getSelectedItem().equals("Medium")) {
+            reharm = new MediumReharm(score);
+    } else {
+            reharm = new AdvancedReharm(score);
+    }
     return reharm;
 }
 
@@ -27465,6 +27479,7 @@ private ImageIcon pauseButton =
     private javax.swing.JPopupMenu.Separator improvSeparator3;
     private javax.swing.JToggleButton improviseButton;
     private javax.swing.JToggleButton reharmoniseButton;
+    private javax.swing.JComboBox reharmoniseMode;
     private javax.swing.JToggleButton inChannel1;
     private javax.swing.JToggleButton inChannel10;
     private javax.swing.JToggleButton inChannel11;

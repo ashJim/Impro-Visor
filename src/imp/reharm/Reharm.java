@@ -1045,6 +1045,12 @@ public abstract class Reharm {
     }
 
 
+    public boolean hasChord(int slot) {
+        if(slot < 0 || slot > score.getChordProg().size() - 1) return false;
+        return score.getChordProg().getChord(slot) != null;
+    }
+
+
     public boolean lastChordIsV(int slot) {
         Chord lastChord = score.getChordProg().getPrevChord(slot);
         if(lastChord == null) return false;
