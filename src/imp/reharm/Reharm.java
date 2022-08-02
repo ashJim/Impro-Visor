@@ -125,6 +125,7 @@ public abstract class Reharm {
         // Select the MelodyPart for analysis
         targetPart = score.getPart(0);
         if(targetPart == null) return;
+        score.getChordProg().delUnits(0, score.getChordProg().size());
         setChordDuration();
         // For each bar...
         for(int chordSlot = 0; chordSlot < targetPart.size() ; chordSlot = chordSlot + chordDuration) {
@@ -664,10 +665,11 @@ public abstract class Reharm {
      * @param sourceSlot The slot that holds the note from which to source the chord choices.
      * @param destSlot The slot to put the new chord.
      */
-    public void setHarmonicSub(int sourceSlot, int destSlot) {
+    public Chord setHarmonicSub(int sourceSlot, int destSlot) {
         String currentNote = getNoteNameAtSlot(sourceSlot);
         // Case 1: current note is not in key
-        if(!inKey(currentNote)) return;
+        if(!inKey(currentNote)) return null;
+        Chord chord = null;
         String[] notesInKey = getNotesInKey();
         Random random = new Random();
         // Case 2: current note is in key and its diatonic chord has 2 harmonic substitutions
@@ -676,21 +678,27 @@ public abstract class Reharm {
         currentNote.equals(notesInKey[5])) {
             int choice = random.nextInt(3);
             if(choice == 0) {
-                score.getChordProg().setChord(destSlot, new Chord(randomExtension(keyChords.get(currentNote)[0])));
+                chord = new Chord(randomExtension(keyChords.get(currentNote)[0]));
+                score.getChordProg().setChord(destSlot, chord);
             } else if(choice == 1) {
-                score.getChordProg().setChord(destSlot, new Chord(randomExtension(keyChords.get(currentNote)[2])));
+                chord = new Chord(randomExtension(keyChords.get(currentNote)[2]));
+                score.getChordProg().setChord(destSlot, chord);
             } else {
-                score.getChordProg().setChord(destSlot, new Chord(randomExtension(keyChords.get(currentNote)[3])));
+                chord = new Chord(randomExtension(keyChords.get(currentNote)[3]));
+                score.getChordProg().setChord(destSlot, chord);
             }
         } else {
             // Case 3: current note is in key and its diatonic chord has 1 harmonic substitution
             int choice = random.nextInt(2);
             if(choice == 0) {
-                score.getChordProg().setChord(destSlot, new Chord(randomExtension(keyChords.get(currentNote)[0])));
+                chord = new Chord(randomExtension(keyChords.get(currentNote)[0]));
+                score.getChordProg().setChord(destSlot, chord);
             } else {
-                score.getChordProg().setChord(destSlot, new Chord(randomExtension(keyChords.get(currentNote)[2])));
+                chord = new Chord(randomExtension(keyChords.get(currentNote)[2]));
+                score.getChordProg().setChord(destSlot, chord);
             }
         }
+        return chord;
     }
 
 
@@ -699,8 +707,8 @@ public abstract class Reharm {
      * that note and picks one at random to go in the slot.
      * @param slot The slot to place the chord.
      */
-    public void setHarmonicSub(int slot) {
-        setHarmonicSub(slot, slot);
+    public Chord setHarmonicSub(int slot) {
+        return setHarmonicSub(slot, slot);
     }
 
 
@@ -898,6 +906,7 @@ public abstract class Reharm {
     public boolean isChordToneOf(String note, String chord) {
         // Get the 7th arpeggio notes of the chord
         String[] arp = get7thArpeggio(chord);
+        if(arp == null) return false;
         // Check whether the current note is a note of the 7th arpeggio for the chord
         int i = 0;
         boolean inArp = false;
@@ -912,12 +921,168 @@ public abstract class Reharm {
 
 
     /**
+     * Returns an array containing the names of the notes which occur most frequently between the given slot 
+     * and the next slot.
+     * @param slot
+     * @return
+     */
+    public ArrayList<String> mostFrequentNotes(int slot) {
+        MelodyPart part = score.getPart(0);
+        ArrayList<String> notes = new ArrayList<>();
+        
+        for(int i = slot; i < slot + chordDuration; i++) {
+            Note note = part.getNote(i);
+            if(note == null) continue;
+            String noteName = note.getPitchClassName();
+            if(!keyChords.containsKey(noteName)) continue;
+
+        }
+
+        return notes;
+    }
+
+
+    public ArrayList<String> getNotesInSlot(int slot) {
+        ArrayList<String> notesInSlot = new ArrayList<>();
+        MelodyPart part = score.getPart(0);
+        for(int i = slot; i < slot + chordDuration; i++) {
+            Note note = part.getNote(i);
+            if(note == null) continue;
+            String noteName = note.getPitchClassName();
+            if(!keyChords.containsKey(noteName)) continue;
+            notesInSlot.add(noteName);
+        }
+        return notesInSlot;
+    }
+
+
+    public ArrayList<String> getBestChordMatches(int slot) {
+        // set up a hash map for notes of the key with int value attached to each for frequency of notes within their diatonic arp.
+        HashMap<String, Integer> rootNotes = new HashMap<>();
+        for(String root : getNotesInKey()) {
+            rootNotes.put(root, 0);
+        }
+        // for each note in the slot:
+        for(String note : getNotesInSlot(slot)) {
+            // check note against each key in the keySet for the hash map, add 1 to each which includes the note within its arp.
+            for(String root : rootNotes.keySet()) {
+                if(isChordToneOf(note, root)) {
+                    if(rootNotes.get(root) == 0) {
+                        rootNotes.put(root, 1);
+                    } else {
+                        rootNotes.put(root, rootNotes.get(root) + 1);
+                    }
+                }
+            }
+        }
+        // save the highest int value in the hash map values
+        int highestFrequency = Collections.max(rootNotes.values());
+        // create a new array list for the notes with the highest frequency
+        ArrayList<String> bestMatches = new ArrayList<>();
+        // for each of the notes in the hash map keySet:
+        for(String root : rootNotes.keySet()) {
+            // if that note's value == the highest int:
+            if(rootNotes.get(root) == highestFrequency) {
+                // add it to the new array list
+                bestMatches.add(root);
+            }
+        }
+        return bestMatches;
+    }
+
+
+    public Chord setChordMatch(int slot) {
+        ArrayList<String> matches = getBestChordMatches(slot);
+        Random random = new Random();
+        int choice = random.nextInt(matches.size());
+        Chord newChord = new Chord(randomExtension(keyChords.get(matches.get(choice))[0]));
+        score.getChordProg().setChord(slot, newChord);
+        return newChord;
+    }
+
+
+    public void setDifferentChordTo(int sourceSlot, int destSlot) {
+        // The note to set chord from
+        Note destNote = score.getPart(0).getNote(destSlot);
+        if(destNote == null) return;
+        // The chord to avoid setting
+        Chord avoidChord = score.getChordProg().getChord(sourceSlot);
+        if(avoidChord == null) {
+            setChordMatch(destSlot);
+            return;
+        }
+        // The root note for the avoid chord
+        String avoidRoot = getRoot(avoidChord.getName());
+        // Establish a chord that will be set
+        Chord destChord = null;
+        // while the chord is either null or has the same root as the avoid chord...
+        while(destChord == null || getRoot(destChord.getName()).equals(avoidRoot)) {
+            // System.out.println(getRoot(destChord.getName()).equals(avoidRoot));
+            // System.out.println(avoidRoot);
+            // System.out.println(getRoot(destChord.getName()));
+            destChord = setHarmonicSub(destSlot);
+            if(destChord == null) {
+                destChord = setChordMatch(destSlot);
+            }
+        }
+    }
+
+
+    public boolean isTritoneSub(int slot) {
+        // Get the chord to check
+        Chord chord = score.getChordProg().getChord(slot);
+        if(chord == null) return false;
+        // Get the note from which to source the tritone sub
+        Note note = score.getPart(0).getNote(slot - chordDuration);
+        if(note == null) return false;
+        // Get the String representations of the chord and note
+        String chordName = chord.getName();
+        if(!isDominant(chordName)) return false;
+        String noteName = note.getPitchClassName();
+        // Get the root note for the chord
+        String chordRoot = getRoot(chordName);
+        // Get the root note for the tritone substitution chord associated with the note
+        String tritoneRoot = getRoot(keyChords.get(noteName)[1]);
+        // check whether the tritoneRoot is the same as the root note for the chord and return the result
+        return chordRoot.equals(tritoneRoot);    
+    }
+
+
+    public boolean isDominant(String chord) {   
+        if(chord.length() == 1) {
+            if(!getRoot(chord).equals(getNotesInKey()[4])) return false;
+        } 
+        if(chord.length() == 2) {
+            // String[] list = new String[{7, 9, 11, 13}]
+            ArrayList<String> extensions = new ArrayList<>(Arrays.asList("7", "9"));
+            if(getRoot(chord).length() == 1) {
+                if(!extensions.contains(chord.substring(1, 2))) return false;
+            }
+            if(getRoot(chord).length() > 1) {
+                if(!getRoot(chord).equals(getNotesInKey()[4])) return false;
+            }
+        }
+        if(chord.length() > 2) {
+            ArrayList<String> extensions = new ArrayList<>(Arrays.asList("7", "9", "1"));
+            if(getRoot(chord).length() == 1) {
+                if(!extensions.contains(chord.substring(1, 2))) return false;
+            }
+            if(getRoot(chord).length() == 2) {
+                if(!extensions.contains(chord.substring(2, 3))) return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
      * Returns the most frequently occurring note between the current slot and the next slot.
      * @param slot The slot to start checking at.
      * @return The name of the most frequently occurring note between the given slot and the next slot.
      */
     public String mostFrequentNote(int slot) {
-        // a place to store the notes in the bar
+        // a place to store the notes in the slot
         ArrayList<String> notesInSlot = new ArrayList<>();
         // For each note in that slot...
         for(int i = slot; i < slot + chordDuration; i++) {

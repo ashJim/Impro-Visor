@@ -22,6 +22,6 @@ public class BasicReharm extends Reharm {
 
         @Override
     public void implementChordChoice(int chordSlot) {
-        setRootChord(chordSlot);
+        setChordMatch(chordSlot);
     }
 }

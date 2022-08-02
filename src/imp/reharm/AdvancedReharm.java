@@ -35,13 +35,18 @@ public class AdvancedReharm extends Reharm {
         if(isStartOfBar(chordSlot)) {
             // if note is in key and not the same as the note at the last chord position...
             if(inKey(currentNote) && !currentNote.equals(prevNote)) {
-                setHarmonicSub(chordSlot);
+                setChordMatch(chordSlot);
             }
             if(!inKey(currentNote)) {
                 setDiminishedChord(chordSlot);
             }
             if(isChordVthenI(chordSlot - (chordDuration * 2), chordSlot)) {
                 setAlteredChordV(chordSlot - chordDuration);
+            }
+            // if the chord in the middle of the last bar is tritone sub...
+            if(isTritoneSub(chordSlot - chordDuration)) {
+                // don't place the same chord as at the start of last bar.
+                setDifferentChordTo(chordSlot - (chordDuration * 2), chordSlot);
             }
         }
         if(!isStartOfBar(chordSlot)) {
@@ -53,6 +58,8 @@ public class AdvancedReharm extends Reharm {
                         Random random = new Random();
                         if(random.nextInt(2) == 0) {
                             setTritoneSub(chordSlot - chordDuration, chordSlot);
+                        } else {
+                            score.getChordProg().delUnit(chordSlot);
                         }
                     } 
                     if(!isChordToneOf(currentNote, prevChordName)) {
