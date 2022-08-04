@@ -24,6 +24,7 @@ import imp.fractal.FractalFrame;
 import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
 import imp.reharm.Reharm;
+import imp.reharm.CustomReharm;
 import imp.reharm.AdvancedReharm;
 import imp.reharm.MediumReharm;
 import imp.reharm.BasicReharm;
@@ -11609,7 +11610,7 @@ public Reharm getReharmInstance() {
     } else if(reharmoniseMode.getSelectedItem().equals("Medium")) {
             reharm = new MediumReharm(score);
     } else {
-            reharm = new AdvancedReharm(score);
+            reharm = new CustomReharm(score);
     }
     return reharm;
 }

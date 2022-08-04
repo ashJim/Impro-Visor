@@ -41,6 +41,10 @@ public abstract class Reharm {
      * The number of slots that each chord will last
      */
     protected int chordDuration;
+    /**
+     * An array of locked slots
+     */
+    protected ArrayList<Integer> lockedSlots;
 
     /** An array containing String representations of the notes of the C major scale. */
     protected String[] cScale         = {"c", "d", "e", "f", "g", "a", "b"};
@@ -97,14 +101,16 @@ public abstract class Reharm {
      * setChordDuration(chordDuration), replacing chordDuration parameter with the required length 
      * in slots between chords.
      */
-    public abstract void setChordDuration();
+    public abstract int getChordDuration();
     /**
      * This method is run at every point a new chord is to be placed. It details how the 
      * chord will be picked, based on the keyChords HashMap of notes and suitable chords.
-     * @param chordSlot The slot in which to put a chord. We iterate through the chordSlots 
+     * @param slot The slot in which to put a chord. We iterate through the chordSlots 
      * and implement this method for each.
      */
-    public abstract void implementChordChoice(int chordSlot);
+    public abstract void implementChordChoice(int slot);
+
+    public abstract void adjustChordChoice(int slot);
 
 
     /* METHODS USED TO RUN THE REHARM FEATURE (CALLED IN NOTATE) */
@@ -125,11 +131,16 @@ public abstract class Reharm {
         // Select the MelodyPart for analysis
         targetPart = score.getPart(0);
         if(targetPart == null) return;
+        initLockedSlots();
         score.getChordProg().delUnits(0, score.getChordProg().size());
-        setChordDuration();
-        // For each bar...
-        for(int chordSlot = 0; chordSlot < targetPart.size() ; chordSlot = chordSlot + chordDuration) {
+        chordDuration = getChordDuration();
+        // Iterate through each bar, setting chords that work with the notes present
+        for(int chordSlot = 0; chordSlot < targetPart.size(); chordSlot = chordSlot + chordDuration) {
             implementChordChoice(chordSlot);
+        }
+        // Iterate through each bar again, adjusting the chords to work with surrounding chords.
+        for(int chordSlot = 0; chordSlot < targetPart.size(); chordSlot = chordSlot + chordDuration) {
+            adjustChordChoice(chordSlot);
         }
     }
 
@@ -246,7 +257,36 @@ public abstract class Reharm {
             }          
         }
     }
+
+
+    public void initLockedSlots() {
+        if(lockedSlots == null) {
+            lockedSlots = new ArrayList<>();
+        }
+        unlockAllSlots();
+    }
+
+
+    public void lock(int slot) {
+        if(isLocked(slot)) return;
+        lockedSlots.add(slot);
+    }
+
+
+    public void unlock(int slot) {
+        lockedSlots.remove((Integer)slot);
+    }
+
+
+    public boolean isLocked(int slot) {
+        return lockedSlots.contains(slot);
+    }
     
+
+    public void unlockAllSlots() {
+        lockedSlots.clear();
+    }
+
     
     /** 
      * Targets all the chordSets array positions that correspond to notes that are not in-key and fills them
@@ -637,11 +677,10 @@ public abstract class Reharm {
      * Sets chord V with an added random alteration in the given slot.
      * @param slot The slot to set the chord.
      */
-    public void setAlteredChordV(int slot) {
-        String noteV = getNotesInKey()[4];
-        String chordV = keyChords.get(noteV)[0];
-
-        score.getChordProg().setChord(slot, new Chord(random7thAlteration(chordV)));
+    public void setAlteredChord(int slot, int chordNumber) {
+        if(isLocked(slot)) return;
+        String chord = generateRootTriads(getNotesInKey())[chordNumber - 1];
+        score.getChordProg().setChord(slot, new Chord(random7thAlteration(chord)));
     }
 
 
@@ -650,13 +689,43 @@ public abstract class Reharm {
      * @param sourceSlot The slot with the chord to base the tritone substitution on.
      * @param destSlot The destination for the tritone substitution chord.
      */
+    // public void setTritoneSub(int sourceSlot, int destSlot) {
+    //     String currentNote = getNoteNameAtSlot(sourceSlot);
+    //     // Case 1: current note is not in key
+    //     if(!inKey(currentNote)) return;
+    //     // Case 2: current note is in key, and should have a tritone substitution set from it
+    //     score.getChordProg().setChord(destSlot, new Chord(random7thExtension(keyChords.get(currentNote)[1])));
+    // }
     public void setTritoneSub(int sourceSlot, int destSlot) {
-        String currentNote = getNoteNameAtSlot(sourceSlot);
-        // Case 1: current note is not in key
-        if(!inKey(currentNote)) return;
-        // Case 2: current note is in key, and should have a tritone substitution set from it
-        score.getChordProg().setChord(destSlot, new Chord(random7thExtension(keyChords.get(currentNote)[1])));
+        if(isLocked(destSlot)) return;
+        Chord sourceChord = score.getChordProg().getChord(sourceSlot);
+        if(sourceChord == null) return;
+
+        String sourceChordName = sourceChord.getName();
+        String sourceChordRoot = getRoot(sourceChordName);
+
+        String[] notesInKey = getNotesInKey();
+
+        int i = 0;
+        int indexInKey = 0;
+        boolean found = false;
+        while(!found || i < notesInKey.length) {
+            if(notesInKey[i].equals(sourceChordRoot)) {
+                indexInKey = i;
+                found = true;
+            }
+            i++;
+        }
+        if(!found) return;
+
+        String[] tritoneSubs = generateTritoneSubs();
+        String destChordName = random7thExtension(tritoneSubs[indexInKey]);
+
+        score.getChordProg().setChord(destSlot, new Chord(destChordName));
     }
+
+
+
 
 
     /**
@@ -1102,6 +1171,38 @@ public abstract class Reharm {
             }
         }
         return mostFrequentNote;
+    }
+
+
+    public boolean isChordNumber(int slot, int chordNumber) {
+        if(chordNumber < 1 || chordNumber > 7) return false;
+        Chord ourChord = score.getChordProg().getChord(slot);
+        if(ourChord == null) return false;
+        String ourChordName = ourChord.getName();
+        String ourChordRoot = getRoot(ourChordName);
+        String targetRoot = getNotesInKey()[chordNumber - 1];
+
+        return ourChordRoot.equals(targetRoot);
+    }
+
+
+    public void setDiatonicChord(int slot, int chordNumber) {
+        if(isLocked(slot)) return;
+        if(chordNumber < 1 || chordNumber > 7) {
+            System.out.println("chord number out of range");
+        }
+        
+        String[] notesInKey = getNotesInKey();
+        String root = notesInKey[chordNumber - 1];
+        String triad = keyChords.get(root)[0];
+        String chord = randomExtension(triad);
+
+        score.getChordProg().setChord(slot, new Chord(chord));
+    }
+
+
+    public boolean isLastBar(int slot) {
+        return slot + score.getSlotsPerMeasure() >= score.getPart(0).size();
     }
 
 
