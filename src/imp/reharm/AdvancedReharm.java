@@ -2,6 +2,7 @@ package imp.reharm;
 
 import java.util.Random;
 
+import imp.Constants;
 import imp.data.Chord;
 import imp.data.Note;
 import imp.data.Score;
@@ -22,57 +23,87 @@ public class AdvancedReharm extends Reharm {
     }
 
     @Override
-    public void setChordDuration() {
-        setChordDuration(score.getSlotsPerMeasure() / 2);
+    public int getChordDuration() {
+        return score.getSlotsPerMeasure() / 2;
     }
 
     @Override
-    public void implementChordChoice(int chordSlot) {
+    public void implementChordChoice(int slot) {
         
-        String currentNote = getNoteNameAtSlot(chordSlot);    
-        String prevNote = getNoteNameAtSlot(chordSlot - chordDuration);
-                
-        if(isStartOfBar(chordSlot)) {
+        String currentNote = getNoteNameAtSlot(slot);    
+        String prevNote = getNoteNameAtSlot(slot - chordDuration);
+        
+        if(isStartOfBar(slot)) {
             // if note is in key and not the same as the note at the last chord position...
             if(inKey(currentNote) && !currentNote.equals(prevNote)) {
-                setChordMatch(chordSlot);
+                setChordMatch(slot);
             }
             if(!inKey(currentNote)) {
-                setDiminishedChord(chordSlot);
+                setDiminishedChord(slot);
             }
-            if(isChordVthenI(chordSlot - (chordDuration * 2), chordSlot)) {
-                setAlteredChordV(chordSlot - chordDuration);
+            if(isChordNumber(slot - (chordDuration * 2), 5)
+            && (isChordNumber(slot, 1))) {
+                setAlteredChord(slot - chordDuration, 5);
             }
             // if the chord in the middle of the last bar is tritone sub...
-            if(isTritoneSub(chordSlot - chordDuration)) {
+            if(isTritoneSub(slot - chordDuration)) {
                 // don't place the same chord as at the start of last bar.
-                setDifferentChordTo(chordSlot - (chordDuration * 2), chordSlot);
+                setDifferentChordTo(slot - (chordDuration * 2), slot);
+            }
+            // Complete any partial II V I patterns
+            if(isChordNumber(slot - (chordDuration * 2), 2)
+            && (isChordNumber(slot - chordDuration, 5))) {
+                setDiatonicChord(slot, 1);
+            } else if(isChordNumber(slot - (chordDuration * 2), 2)
+            && (isChordNumber(slot, 1))) {
+                setDiatonicChord(slot - chordDuration, 5);
+            } else if(isChordNumber(slot - chordDuration, 5)
+            && (isChordNumber(slot, 1))) {
+                setDiatonicChord(slot - (chordDuration * 2), 2);
             }
         }
-        if(!isStartOfBar(chordSlot)) {
+        if(!isStartOfBar(slot)) {
+            Note startBarNote = score.getPart(0).getNote(slot - chordDuration);
+            if(startBarNote instanceof Note && startBarNote.getRhythmValue() == score.getSlotsPerMeasure()
+            && inKey(startBarNote.getPitchClassName())) {
+                Random random = new Random();
+                if(random.nextInt(2) == 0) {
+                    setTritoneSub(slot - chordDuration, slot);
+                }
+            }
             if(inKey(currentNote)) {
-                Chord prevChord = score.getChordProg().getPrevChord(chordSlot);
+                Chord prevChord = score.getChordProg().getPrevChord(slot);
                 if(prevChord != null) {
                     String prevChordName = prevChord.getName();
                     if(isChordToneOf(currentNote, prevChordName)) {
                         Random random = new Random();
                         if(random.nextInt(2) == 0) {
-                            setTritoneSub(chordSlot - chordDuration, chordSlot);
+                            setTritoneSub(slot - chordDuration, slot);
                         } else {
-                            score.getChordProg().delUnit(chordSlot);
+                            score.getChordProg().delUnit(slot);
                         }
                     } 
                     if(!isChordToneOf(currentNote, prevChordName)) {
-                        setHarmonicSub(chordSlot);
+                        setHarmonicSub(slot);
                     }
                 } 
                 if(prevChord == null) {
-                    setHarmonicSub(chordSlot);
+                    setHarmonicSub(slot);
                 }
             } 
             if(!inKey(currentNote)) {
-                setDiminishedChord(chordSlot);
+                setDiminishedChord(slot);
             }
-        }           
+        }
+        // Set something that resolves for the last bar
+        if(isStartOfBar(slot) && isLastBar(slot)) {
+            setDiatonicChord(slot, 1);
+        }
+    }
+
+    @Override
+    public void adjustChordChoice(int chordSlot) {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -16,12 +16,18 @@ public class BasicReharm extends Reharm {
     }
 
     @Override
-    public void setChordDuration() {
-        setChordDuration(score.getSlotsPerMeasure());
+    public int getChordDuration() {
+        return score.getSlotsPerMeasure();
     }
 
         @Override
     public void implementChordChoice(int chordSlot) {
         setChordMatch(chordSlot);
+    }
+
+    @Override
+    public void adjustChordChoice(int chordSlot) {
+        // TODO Auto-generated method stub
+        
     }
 }

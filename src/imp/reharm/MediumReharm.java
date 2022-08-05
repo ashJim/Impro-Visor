@@ -16,8 +16,8 @@ public class MediumReharm extends Reharm {
     }
 
     @Override
-    public void setChordDuration() {
-        setChordDuration(score.getSlotsPerMeasure() / 2);
+    public int getChordDuration() {
+        return score.getSlotsPerMeasure() / 2;
     }
 
     @Override
@@ -44,6 +44,12 @@ public class MediumReharm extends Reharm {
                 setDiminishedChord(chordSlot);
             }
         }
+    }
+
+    @Override
+    public void adjustChordChoice(int chordSlot) {
+        // TODO Auto-generated method stub
+        
     }
     
 }

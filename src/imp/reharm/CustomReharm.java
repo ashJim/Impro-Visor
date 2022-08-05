@@ -48,7 +48,7 @@ public class CustomReharm extends Reharm {
         int oneBarAhead = slot + (chordDuration * 2);
 
         if(isStartOfBar(slot)) {
-            // complete any incomplete II V I progs
+            // complete any incomplete II V I progs starting from this slot
             if(isChordNumber(nextSlot, 5) 
             && isChordNumber(oneBarAhead, 1)) {
                 setDiatonicChord(slot, 2);
@@ -70,15 +70,34 @@ public class CustomReharm extends Reharm {
                 lock(nextSlot);
                 lock(oneBarAhead);
             }
+            
             // If the current slot is the end of a II V I
             if(isChordNumber(oneBarBehind, 2)
             && isChordNumber(prevSlot, 5)
             && isChordNumber(slot, 1)) {
-                // Sort out the chord that follows the II V I
+                // Delete chord in last half bar if this is the last bar
                 if(isLastBar(slot)) {
                     unlock(nextSlot);
                     score.getChordProg().delUnit(nextSlot);
                     lock(nextSlot);
+                // I VI II V turnaround if the current slot is bar 7 of any 8-bar phrase
+                } else if((slot + (score.getSlotsPerMeasure() * 2)) % (score.getSlotsPerMeasure() * 8) == 0) {
+                    if(isLastBar(slot + score.getSlotsPerMeasure())) {
+                        setDiatonicChord(nextSlot, 4);
+                        setDiatonicChord(oneBarAhead, 5);
+                        setDiatonicChord(oneBarAhead + chordDuration, 1);
+                        lock(nextSlot);
+                        lock(oneBarAhead);
+                        lock(oneBarAhead + chordDuration);
+                    // Ending turnaround for the last 2 bars of head
+                    } else {
+                    setDiatonicChord(nextSlot, 6);
+                    setDiatonicChord(oneBarAhead, 2);
+                    setDiatonicChord(oneBarAhead + chordDuration, 5);
+                    lock(nextSlot);
+                    lock(oneBarAhead);
+                    lock(oneBarAhead + chordDuration);
+                    }
                 } else {
                     Random random = new Random();
                     switch(random.nextInt(3)) {
@@ -96,10 +115,10 @@ public class CustomReharm extends Reharm {
                 Chord thisChord = score.getChordProg().getChord(slot);
                 if(thisChord != null 
                 && (!majorityInKey(slot) || !getBestChordMatches(slot).contains(getRoot(thisChord.getName())))) {
-                    unlock(slot);
-                    unlock(prevSlot);
-                    unlock(oneBarBehind);
-                    unlock(nextSlot);
+                    // unlock(slot);
+                    // unlock(prevSlot);
+                    // unlock(oneBarBehind);
+                    // unlock(nextSlot);
                     setDiatonicChord(oneBarBehind, 2);
                     setTritoneSub(oneBarBehind, prevSlot);
                     setAlteredChord(slot, 5);
@@ -110,22 +129,7 @@ public class CustomReharm extends Reharm {
                     lock(nextSlot);
                 }   
             }
-            // add either an altered dominant or tritone sub between any V I progs
-            if(isChordNumber(slot, 5)
-            && isChordNumber(oneBarAhead, 1)) {
-                Random random = new Random();
-                switch(random.nextInt(2)) {
-                    case 0:
-                        setAlteredChord(nextSlot, 5);
-                        break;
-                    case 1:
-                        setTritoneSub(slot, nextSlot);
-                        break;
-                }
-                lock(slot);
-                lock(nextSlot);
-                lock(oneBarAhead);
-            }
+
             // Complete any incomplete minor II V I progs
             if(isChordNumber(nextSlot, 3) 
             && isChordNumber(oneBarAhead, 6)) {
@@ -150,10 +154,12 @@ public class CustomReharm extends Reharm {
                 lock(nextSlot);
                 lock(oneBarAhead);
             }
-            // Sort out the chord that follows the minor II V I
+
+            // If the current slot is the end of a minor II V I
             if(isChordNumber(oneBarBehind, 7)
             && isChordNumber(prevSlot, 3)
             && isChordNumber(slot, 6)) {
+                // Sort out the chord that follows the minor II V I
                 if(isLastBar(slot)) {
                     unlock(nextSlot);
                     score.getChordProg().delUnit(nextSlot);
@@ -173,6 +179,24 @@ public class CustomReharm extends Reharm {
                     lock(nextSlot);
                 }
             }
+
+            // add either an altered dominant or tritone sub between any V I progs
+            if(isChordNumber(slot, 5)
+            && isChordNumber(oneBarAhead, 1)) {
+                Random random = new Random();
+                switch(random.nextInt(2)) {
+                    case 0:
+                        setAlteredChord(nextSlot, 5);
+                        break;
+                    case 1:
+                        setTritoneSub(slot, nextSlot);
+                        break;
+                }
+                lock(slot);
+                lock(nextSlot);
+                lock(oneBarAhead);
+            }
+            
             // Get rid of repeated chords
             Chord thisChord = score.getChordProg().getChord(slot);
             Chord nextChord = score.getChordProg().getChord(nextSlot);
@@ -195,6 +219,4 @@ public class CustomReharm extends Reharm {
             }
         }
     }
-    
-    
 }

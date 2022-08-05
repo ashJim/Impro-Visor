@@ -54,7 +54,7 @@ public class DiminishedReharm extends Reharm {
     }
 
     @Override
-    public void setChordDuration() {
+    public void getChordDuration() {
         setChordDuration(score.getSlotsPerMeasure() / 2);
     }
 
