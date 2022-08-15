@@ -5,9 +5,9 @@ import java.util.Random;
 import imp.data.Chord;
 import imp.data.Score;
 
-public class CustomReharm extends Reharm {
+public class ChordLedReharm extends Reharm {
 
-    public CustomReharm(Score score) {
+    public ChordLedReharm(Score score) {
         super(score);
     }
 

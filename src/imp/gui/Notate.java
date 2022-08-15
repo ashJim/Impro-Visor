@@ -24,8 +24,8 @@ import imp.fractal.FractalFrame;
 import imp.guidetone.GuideToneLineDialog;
 import imp.neuralnet.CriticDialog;
 import imp.reharm.Reharm;
-import imp.reharm.CustomReharm;
-import imp.reharm.AdvancedReharm;
+import imp.reharm.ChordLedReharm;
+import imp.reharm.NoteLedReharm;
 import imp.reharm.MediumReharm;
 import imp.reharm.BasicReharm;
 import imp.reharm.CommonNoteReharm;
@@ -7559,7 +7559,7 @@ public Critic getCritic()
         });
         standardToolbar.add(reharmoniseButton);
 
-        String[] reharmModes = {"Basic", "Medium", "Advanced"};
+        String[] reharmModes = {"Basic", "Note Led", "Chord Led"};
         reharmoniseMode = new javax.swing.JComboBox(reharmModes);
         reharmoniseMode.setMaximumSize(new java.awt.Dimension(130, 60));
         reharmoniseMode.setMinimumSize(new java.awt.Dimension(130, 60));
@@ -11607,10 +11607,10 @@ public void reharm() {
 public Reharm getReharmInstance() {
     if(reharmoniseMode.getSelectedItem().equals("Basic")) {
             reharm = new BasicReharm(score);
-    } else if(reharmoniseMode.getSelectedItem().equals("Medium")) {
-            reharm = new MediumReharm(score);
+    } else if(reharmoniseMode.getSelectedItem().equals("Note Led")) {
+            reharm = new NoteLedReharm(score);
     } else {
-            reharm = new CustomReharm(score);
+            reharm = new ChordLedReharm(score);
     }
     return reharm;
 }

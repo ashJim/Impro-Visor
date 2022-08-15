@@ -2,14 +2,13 @@ package imp.reharm;
 
 import java.util.Random;
 
-import imp.Constants;
 import imp.data.Chord;
 import imp.data.Note;
 import imp.data.Score;
 
-public class AdvancedReharm extends Reharm {
+public class NoteLedReharm extends Reharm {
 
-    public AdvancedReharm(Score score) {
+    public NoteLedReharm(Score score) {
         super(score);
     }
 
@@ -30,36 +29,25 @@ public class AdvancedReharm extends Reharm {
     @Override
     public void implementChordChoice(int slot) {
         
-        String currentNote = getNoteNameAtSlot(slot);    
+        Note currentNote = score.getPart(0).getCurrentNote(slot);
+        String currentNoteName = getNoteNameAtSlot(slot);    
         String prevNote = getNoteNameAtSlot(slot - chordDuration);
         
+        if(currentNote.isRest()) {
+            setChordMatch(slot);
+        }
+
         if(isStartOfBar(slot)) {
             // if note is in key and not the same as the note at the last chord position...
-            if(inKey(currentNote) && !currentNote.equals(prevNote)) {
+            if(inKey(currentNoteName) && !currentNoteName.equals(prevNote)) {
                 setChordMatch(slot);
             }
-            if(!inKey(currentNote)) {
+            if(!inKey(currentNoteName)) {
                 setDiminishedChord(slot);
             }
             if(isChordNumber(slot - (chordDuration * 2), 5)
             && (isChordNumber(slot, 1))) {
                 setAlteredChord(slot - chordDuration, 5);
-            }
-            // if the chord in the middle of the last bar is tritone sub...
-            if(isTritoneSub(slot - chordDuration)) {
-                // don't place the same chord as at the start of last bar.
-                setDifferentChordTo(slot - (chordDuration * 2), slot);
-            }
-            // Complete any partial II V I patterns
-            if(isChordNumber(slot - (chordDuration * 2), 2)
-            && (isChordNumber(slot - chordDuration, 5))) {
-                setDiatonicChord(slot, 1);
-            } else if(isChordNumber(slot - (chordDuration * 2), 2)
-            && (isChordNumber(slot, 1))) {
-                setDiatonicChord(slot - chordDuration, 5);
-            } else if(isChordNumber(slot - chordDuration, 5)
-            && (isChordNumber(slot, 1))) {
-                setDiatonicChord(slot - (chordDuration * 2), 2);
             }
         }
         if(!isStartOfBar(slot)) {
@@ -71,11 +59,11 @@ public class AdvancedReharm extends Reharm {
                     setTritoneSub(slot - chordDuration, slot);
                 }
             }
-            if(inKey(currentNote)) {
+            if(inKey(currentNoteName)) {
                 Chord prevChord = score.getChordProg().getPrevChord(slot);
                 if(prevChord != null) {
                     String prevChordName = prevChord.getName();
-                    if(isChordToneOf(currentNote, prevChordName)) {
+                    if(isChordToneOf(currentNoteName, prevChordName)) {
                         Random random = new Random();
                         if(random.nextInt(2) == 0) {
                             setTritoneSub(slot - chordDuration, slot);
@@ -83,7 +71,7 @@ public class AdvancedReharm extends Reharm {
                             score.getChordProg().delUnit(slot);
                         }
                     } 
-                    if(!isChordToneOf(currentNote, prevChordName)) {
+                    if(!isChordToneOf(currentNoteName, prevChordName)) {
                         setHarmonicSub(slot);
                     }
                 } 
@@ -91,7 +79,7 @@ public class AdvancedReharm extends Reharm {
                     setHarmonicSub(slot);
                 }
             } 
-            if(!inKey(currentNote)) {
+            if(!inKey(currentNoteName)) {
                 setDiminishedChord(slot);
             }
         }
