@@ -18,7 +18,6 @@ and open the template in the editor.
                 <dependency org="org.apache.commons" name="commons-configuration2" rev="2.0">
                     <artifact name="commons-configuration2" type="jar" />
                 </dependency>
-                <!-- <dependency org="junit" name="junit" rev="3.8" conf="test->default"/> -->
 		<!--dependency org="org.deeplearning4j" name="deeplearning4j-core" rev="0.4-rc3.9" conf="build->default"/>-->
                 <!--<dependency org="org.nd4j" name="nd4j-native" rev="0.4-rc3.9"/>-->
 		<!--<dependency org="org.jblas" name="jblas" rev="1.2.4" />-->

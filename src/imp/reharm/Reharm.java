@@ -1103,7 +1103,7 @@ public abstract class Reharm {
             chordSets[setIndex] = new String[1];
         }
         // If the index we are trying to fill is out of bounds...
-        else if (chordSets[setIndex].length <= chordIndex) {
+        if (chordSets[setIndex].length <= chordIndex) {
             String[] newArr = new String[chordIndex + 1];
             for(int i = 0; i < chordSets[setIndex].length; i++) {
                 newArr[i] = chordSets[setIndex][i];
