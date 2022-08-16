@@ -10,6 +10,7 @@ and open the template in the editor.
 	<info organisation="org.apache" module="testProject" branch="" revision="1.0" />
 	<configurations>
             <conf name="build" description="build configuration"/>
+            <conf name="test" description="test configuration" extends="build"/>
         </configurations>
         <dependencies>
 		<!--dependency org="org.slf4j" name="slf4j-simple" rev="1.7.21"/>-->
