@@ -2,6 +2,16 @@ package imp.reharm;
 
 import imp.data.Score;
 
+/**
+ * This Reharm subclass was designed to demonstrate the pairing of diminished chords with notes outside 
+ * the key as a method of reharmonisation. Notes in the key are paired with the diatonic chord with that 
+ * note as its root. Notes that are out of key are paired with the diminished 7th chord that note as its 
+ * root. At half bar intervals, the system checks the note at that slot and places its paired chord in 
+ * that position. Its functionality has since been moved in to the Reharm subclasses NoteLedReharm and 
+ * ChordLedReharm, both selectable from the pull down menu in the GUI, while the diminished chord generation 
+ * functionality in generateSubstitutions has been migrated to the Reharm superclass for the sake of reusability.
+ * @author Jim Ashford
+ */
 public class DiminishedReharm extends Reharm {
     public DiminishedReharm(Score score) {
         super(score);
@@ -54,12 +64,19 @@ public class DiminishedReharm extends Reharm {
     }
 
     @Override
-    public void getChordDuration() {
-        setChordDuration(score.getSlotsPerMeasure() / 2);
+    public int getChordDuration() {
+        return score.getSlotsPerMeasure() / 2;
     }
 
     @Override
     public void implementChordChoice(int chordSlot) {
         setRootChord(chordSlot);        
+    }
+
+    @Override
+    public void adjustChordChoice(int slot) {
+        // This mode uses only the notes of the melody to inform its chord choices,
+        // so there is no implementation of adjustChordChoice.
+        
     }
 }

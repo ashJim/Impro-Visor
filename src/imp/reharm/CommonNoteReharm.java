@@ -6,6 +6,15 @@ import java.util.Collections;
 import imp.data.Chord;
 import imp.data.Score;
 
+/**
+ * This Reharm subclass we designed to demonstrate the use of the most common note in a section to 
+ * generate a chord for that section as a method of reharmonisation. Its functionality has since been 
+ * moved in to the Reharm subclasses NoteLedReharm and ChordLedReharm, both selectable from the pull 
+ * down menu in the GUI, while the functionality in implementChordChoice that generates chords based 
+ * on the most common note in the section has been migrated to the Reharm superclass for the sake of 
+ * reusability.
+ * @author Jim Ashford
+ */
 public class CommonNoteReharm extends Reharm {
 
     public CommonNoteReharm(Score score) {
@@ -22,8 +31,8 @@ public class CommonNoteReharm extends Reharm {
     }
 
     @Override
-    public void getChordDuration() {
-        setChordDuration(score.getSlotsPerMeasure());
+    public int getChordDuration() {
+        return score.getSlotsPerMeasure();
     }
 
     @Override
@@ -55,5 +64,12 @@ public class CommonNoteReharm extends Reharm {
             score.getChordProg().setChord(chordSlot, new Chord(chord));
             }
         }
+    }
+
+    @Override
+    public void adjustChordChoice(int slot) {
+        // This mode uses only the notes of the melody to inform its chord choices,
+        // so there is no implementation of adjustChordChoice.
+        
     }
 }
