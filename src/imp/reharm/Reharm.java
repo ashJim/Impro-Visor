@@ -23,16 +23,6 @@ import imp.data.Score;
  */
 public abstract class Reharm {
     
-    /* CONSTRUCTOR */
-
-    /**
-     * Creates a new Reharm instance. Called by subclasses upon their instantiation.
-     * @param score The Score instance that this Reharm instance will reharmonise.
-     */
-    public Reharm(Score score) {
-        this.score = score;
-    }
-
     /* FIELDS */
 
     /**
@@ -103,6 +93,17 @@ public abstract class Reharm {
      * so is placed at index 6).
      */
     protected String[][] flatKeys     = {cScale, fScale, bFlatScale, eFlatScale, aFlatScale, dFlatScale, gFlatScale};
+
+    
+    /* CONSTRUCTOR */
+
+    /**
+     * Creates a new Reharm instance. Called by subclasses upon their instantiation.
+     * @param score The Score instance that this Reharm instance will reharmonise.
+     */
+    public Reharm(Score score) {
+        this.score = score;
+    }
 
 
     /* ABSTRACT METHODS TO BE DEFINED IN SUBCLASSES */
